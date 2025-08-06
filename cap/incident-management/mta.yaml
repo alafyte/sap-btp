@@ -64,6 +64,38 @@ modules:
       supported-platforms:
         []
 
+  - name: incident-management-destinations
+    type: com.sap.application.content
+    requires:
+      - name: incident-management-auth
+        parameters:
+          service-key:
+            name: incident-management-auth-key
+      - name: incident-management-html5-repo-host
+        parameters:
+          service-key:
+            name: incident-management-html5-repo-host-key
+      - name: srv-api
+      - name: incident-management-destination
+        parameters:
+          content-target: true
+    build-parameters:
+      no-source: true
+    parameters:
+      content:
+        instance:
+          existing_destinations_policy: update
+          destinations:
+            - Name: incident-management-html5-repository
+              ServiceInstanceName: incident-management-html5-repo-host
+              ServiceKeyName: incident-management-html5-repo-host-key
+              sap.cloud.service: incidentmanagement.service
+            - Name: incident-management-auth
+              Authentication: OAuth2UserTokenExchange
+              ServiceInstanceName: incident-management-auth
+              ServiceKeyName: incident-management-auth-key
+              sap.cloud.service: incidentmanagement.service
+
 resources:
   - name: incident-management-destination
     type: org.cloudfoundry.managed-service
@@ -115,3 +147,8 @@ resources:
     parameters:
       service: html5-apps-repo
       service-plan: app-host
+  - name: incident-management-html5-runtime
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: html5-apps-repo
+      service-plan: app-runtime

@@ -51,7 +51,9 @@
         "auth": "xsuaa",
         "db": "hana"
       },
-      "html5-runtime": true
+      "html5-runtime": true,
+      "destinations": true,
+      "workzone": true
     }
   },
   "devDependencies": {
