@@ -19,7 +19,7 @@ modules:
       instances: 1
       buildpack: nodejs_buildpack
     build-parameters:
-      builder: npm-ci
+      builder: npm
     provides:
       - name: srv-api # required by consumers of CAP services (e.g. approuter)
         properties:
@@ -88,6 +88,13 @@ resources:
                 Authentication: NoAuthentication
                 Type: HTTP
                 ProxyType: Internet
+    requires:
+      - name: srv-api
+        group: destinations
+        properties:
+          name: srv-api # must be used in xs-app.json as well
+          url: ~{srv-url}
+          forwardAuthToken: true
   - name: incident-management-auth
     type: org.cloudfoundry.managed-service
     parameters:
