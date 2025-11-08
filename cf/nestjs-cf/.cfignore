@@ -1,0 +1,9 @@
+# Ignore everything by default
+*
+
+# But keep these files/folders
+!dist/
+!package.json
+!pnpm-lock.yaml
+!Procfile
+!manifest.yml
