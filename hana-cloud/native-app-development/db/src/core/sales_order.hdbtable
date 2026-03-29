@@ -1,0 +1,10 @@
+COLUMN TABLE "com.sap.training.sales.core::sales_order" (
+    ORDER_ID      BIGINT        NOT NULL,
+    CUSTOMER_ID   INTEGER,
+    ORDER_DATE    DATE,
+    STATUS        NVARCHAR(50),
+    TOTAL_AMOUNT  DECIMAL(15,2),
+    CREATED_AT    TIMESTAMP,
+
+    PRIMARY KEY (ORDER_ID)
+)

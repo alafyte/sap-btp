@@ -1,0 +1,7 @@
+COLUMN TABLE "com.sap.training.sales.core::product_price" (
+    PRODUCT_ID   BIGINT       NOT NULL,
+    PRICE        DECIMAL(15,2),
+    VALIDFROM   DATE         NOT NULL,
+    VALIDTO     DATE         NOT NULL,
+    PRIMARY KEY (PRODUCT_ID, VALIDFROM)
+)

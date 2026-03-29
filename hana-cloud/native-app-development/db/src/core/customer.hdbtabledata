@@ -1,0 +1,27 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "com.sap.training.sales.core::customer",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "com.sap.training.sales.core::customer.csv",
+        "has_header": true
+      },
+      "import_settings": {
+        "import_columns": [
+          "CUSTOMER_ID",
+          "CUSTOMER_UUID",
+          "NAME",
+          "EMAIL",
+          "PHONE",
+          "DATE_OF_BIRTH",
+          "CREDIT_LIMIT",
+          "IS_ACTIVE",
+          "CREATED_AT",
+          "CREATED_BY"
+        ]
+      }
+    }
+  ]
+}

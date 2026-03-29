@@ -1,0 +1,3 @@
+FUZZY SEARCH INDEX "com.sap.training.sales.core::idx_product_search"
+ON "com.sap.training.sales.core::product" (NAME)
+SEARCH MODE TEXT

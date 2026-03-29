@@ -1,0 +1,15 @@
+COLUMN TABLE "com.sap.training.sales.core::product" (
+    PRODUCT_ID        BIGINT        NOT NULL,
+    PRODUCT_CODE      VARCHAR(50),
+    NAME              NVARCHAR(200),
+    DESCRIPTION       NCLOB,
+    CATEGORY          NVARCHAR(100),
+    CURRENCY          NCHAR(3),
+    WEIGHT            REAL,
+    DIMENSION         DOUBLE,
+    RELEASE_DATE      SECONDDATE,
+    IS_DISCONTINUED   BOOLEAN,
+    CREATED_AT        LONGDATE,
+
+    PRIMARY KEY (PRODUCT_ID)
+)

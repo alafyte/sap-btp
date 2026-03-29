@@ -1,0 +1,3 @@
+CONSTRAINT "com.sap.training.sales.core::fk_sales_order_customer"
+ON "com.sap.training.sales.core::sales_order"
+FOREIGN KEY (CUSTOMER_ID) REFERENCES "com.sap.training.sales.core::customer" (CUSTOMER_ID) ON UPDATE CASCADE

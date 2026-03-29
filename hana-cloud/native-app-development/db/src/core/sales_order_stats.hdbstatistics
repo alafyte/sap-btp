@@ -1,0 +1,2 @@
+STATISTICS "com.sap.training.sales.core::sales_order_stats"
+ON "com.sap.training.sales.core::sales_order" (CUSTOMER_ID)

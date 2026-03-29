@@ -1,0 +1,13 @@
+TRIGGER "com.sap.training.sales.core::update_order_total"
+AFTER INSERT OR UPDATE ON "com.sap.training.sales.core::sales_order_item"
+REFERENCING NEW ROW neworderrow
+FOR EACH ROW
+BEGIN
+ UPDATE "com.sap.training.sales.core::sales_order"
+    SET TOTAL_AMOUNT = (
+        SELECT SUM(QUANTITY * UNIT_PRICE)
+        FROM "com.sap.training.sales.core::sales_order_item"
+        WHERE ORDER_ID = :neworderrow.ORDER_ID
+    )
+    WHERE ORDER_ID = :neworderrow.ORDER_ID;
+END

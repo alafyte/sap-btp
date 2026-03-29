@@ -1,0 +1,3 @@
+CONSTRAINT "com.sap.training.sales.core::fk_product_product_price"
+ON "com.sap.training.sales.core::product_price"
+FOREIGN KEY (PRODUCT_ID) REFERENCES "com.sap.training.sales.core::product" (PRODUCT_ID) ON UPDATE CASCADE

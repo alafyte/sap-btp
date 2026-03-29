@@ -1,0 +1,16 @@
+COLUMN TABLE "com.sap.training.sales.core::customer" (
+    CUSTOMER_ID     INTEGER       NOT NULL,
+    CUSTOMER_UUID   NVARCHAR(36),
+    NAME            NVARCHAR(200),
+    EMAIL           NVARCHAR(255),
+    PHONE           NVARCHAR(50),
+    DATE_OF_BIRTH   DATE,
+    CREDIT_LIMIT    DECIMAL(15,2),
+    IS_ACTIVE       BOOLEAN,
+    CREATED_AT      TIMESTAMP,
+    CREATED_BY      NVARCHAR(100),
+    PROFILE_PIC     BLOB,
+    NOTES           NCLOB,
+    
+    PRIMARY KEY (CUSTOMER_ID)
+);

@@ -1,0 +1,24 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "com.sap.training.sales.core::sales_order_item",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "com.sap.training.sales.core::sales_order_item.csv",
+        "has_header": true
+      },
+      "import_settings": {
+        "import_columns": [
+          "ITEM_ID",
+          "ORDER_ID",
+          "PRODUCT_ID",
+          "QUANTITY",
+          "UNIT_PRICE",
+          "DISCOUNT",
+          "LINE_TOTAL"
+        ]
+      }
+    }
+  ]
+}

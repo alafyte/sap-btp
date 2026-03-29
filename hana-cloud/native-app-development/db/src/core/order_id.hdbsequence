@@ -1,0 +1,2 @@
+SEQUENCE "com.sap.training.sales.core::order_id"
+START WITH 1 INCREMENT BY 1 NO CYCLE;

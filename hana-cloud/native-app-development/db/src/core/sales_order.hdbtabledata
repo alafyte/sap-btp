@@ -1,0 +1,23 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "com.sap.training.sales.core::sales_order",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "com.sap.training.sales.core::sales_order.csv",
+        "has_header": true
+      },
+      "import_settings": {
+        "import_columns": [
+          "ORDER_ID",
+          "CUSTOMER_ID",
+          "ORDER_DATE",
+          "STATUS",
+          "TOTAL_AMOUNT",
+          "CREATED_AT"
+        ]
+      }
+    }
+  ]
+}

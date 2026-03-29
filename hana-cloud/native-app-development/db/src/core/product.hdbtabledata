@@ -1,0 +1,28 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "com.sap.training.sales.core::product",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "com.sap.training.sales.core::product.csv",
+        "has_header": true
+      },
+      "import_settings": {
+        "import_columns": [
+          "PRODUCT_ID",
+          "PRODUCT_CODE",
+          "NAME",
+          "DESCRIPTION",
+          "CATEGORY",
+          "CURRENCY",
+          "WEIGHT",
+          "DIMENSION",
+          "RELEASE_DATE",
+          "IS_DISCONTINUED",
+          "CREATED_AT"
+        ]
+      }
+    }
+  ]
+}
