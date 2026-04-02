@@ -5,7 +5,7 @@ FOR EACH ROW
 BEGIN
  UPDATE "com.sap.training.sales.core::sales_order"
     SET TOTAL_AMOUNT = (
-        SELECT SUM(QUANTITY * UNIT_PRICE)
+        SELECT SUM(QUANTITY * UNIT_PRICE * (100 - DISCOUNT) / 100)
         FROM "com.sap.training.sales.core::sales_order_item"
         WHERE ORDER_ID = :neworderrow.ORDER_ID
     )

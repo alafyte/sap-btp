@@ -15,8 +15,7 @@
           "PRODUCT_ID",
           "QUANTITY",
           "UNIT_PRICE",
-          "DISCOUNT",
-          "LINE_TOTAL"
+          "DISCOUNT"
         ]
       }
     }

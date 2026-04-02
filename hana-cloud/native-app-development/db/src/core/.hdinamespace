@@ -1,4 +1,4 @@
 {
     "name": "com.sap.training.sales.core",
-    "subfolder": "append"
+    "subfolder": "ignore"
 }

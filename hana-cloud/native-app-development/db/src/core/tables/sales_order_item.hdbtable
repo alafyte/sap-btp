@@ -5,6 +5,5 @@ COLUMN TABLE "com.sap.training.sales.core::sales_order_item" (
   QUANTITY INTEGER,
   UNIT_PRICE DECIMAL(15, 2),
   DISCOUNT DECIMAL(5, 2),
-  LINE_TOTAL DECIMAL(15, 2),
   PRIMARY KEY (ITEM_ID)
 )
