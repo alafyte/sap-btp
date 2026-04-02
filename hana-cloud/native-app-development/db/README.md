@@ -148,3 +148,8 @@ SELECT * FROM "com.sap.training.sales.core::inventory_history";
 -- output row1: 1001, WH1, 100, 0, ..., ... ; 
 -- output row2: 1001, WH1, 100, 2, ..., ...
 ```
+
+## SQL Views
+https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/sql-views-hdbview
+
+https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d5fa9b75191014a33eee92692f1702.html

@@ -1,0 +1,36 @@
+VIEW "com.sap.training.sales.analytics::sales_analytics_view"
+AS
+SELECT
+    -- Order Info
+    o.ORDER_ID,
+    o.ORDER_DATE,
+    o.STATUS,
+    
+    -- Customer Info
+    c.CUSTOMER_ID,
+    c.NAME        AS CUSTOMER_NAME,
+    c.EMAIL       AS CUSTOMER_EMAIL,
+
+    -- Product Info
+    p.PRODUCT_ID,
+    p.NAME        AS PRODUCT_NAME,
+    p.CATEGORY    AS PRODUCT_CATEGORY,
+
+    -- Item Info
+    i.ITEM_ID,
+    i.QUANTITY,
+    i.UNIT_PRICE,
+    i.DISCOUNT,
+
+    -- Derived Metrics
+    (i.QUANTITY * i.UNIT_PRICE) AS GROSS_AMOUNT
+
+FROM "com.sap.training.sales.core::sales_order_item" i
+JOIN "com.sap.training.sales.core::sales_order" o
+    ON i.ORDER_ID = o.ORDER_ID
+
+JOIN "com.sap.training.sales.core::customer" c
+    ON o.CUSTOMER_ID = c.CUSTOMER_ID
+
+JOIN "com.sap.training.sales.core::product" p
+    ON i.PRODUCT_ID = p.PRODUCT_ID;
