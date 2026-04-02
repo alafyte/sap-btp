@@ -159,3 +159,6 @@ https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d
 https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/projection-views-hdbprojectionview-and-hdbprojectionviewconfig
 
 https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/e35411b417a94f199679b9f9f45c2306.html
+
+## Calculation Views
+https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/calculation-views-hdbcalculationview

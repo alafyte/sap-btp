@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="com.sap.training.sales.analytics::sales_revenue_cv" applyPrivilegeType="NONE" dataCategory="CUBE" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Aggregation" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" application="BAS">
+<descriptions defaultDescription="sales_revenue_cv"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="com.sap.training.sales.core::sales_order_item">
+    <resourceUri>com.sap.training.sales.core::sales_order_item</resourceUri>
+  </DataSource>
+  <DataSource id="com.sap.training.sales.core::product">
+    <resourceUri>com.sap.training.sales.core::product</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:JoinView" id="Join_1" cardinality="CN_N" joinType="inner">
+    <viewAttributes>
+      <viewAttribute id="NAME"/>
+      <viewAttribute id="PRODUCT_ID" aggregationType="sum"/>
+      <viewAttribute id="QUANTITY" aggregationType="sum"/>
+      <viewAttribute id="UNIT_PRICE" aggregationType="sum"/>
+      <viewAttribute hidden="true" id="JOIN$PRODUCT_ID$PRODUCT_ID"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="com.sap.training.sales.core::sales_order_item">
+      <mapping xsi:type="Calculation:AttributeMapping" target="QUANTITY" source="QUANTITY"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="UNIT_PRICE" source="UNIT_PRICE"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$PRODUCT_ID$PRODUCT_ID" source="PRODUCT_ID"/>
+    </input>
+    <input node="com.sap.training.sales.core::product">
+      <mapping xsi:type="Calculation:AttributeMapping" target="NAME" source="NAME"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="PRODUCT_ID" source="PRODUCT_ID"/>
+      <mapping xsi:type="Calculation:AttributeMapping" target="JOIN$PRODUCT_ID$PRODUCT_ID" source="PRODUCT_ID"/>
+    </input>
+    <joinAttribute name="JOIN$PRODUCT_ID$PRODUCT_ID"/>
+  </calculationView>
+</calculationViews>
+
+<logicalModel id="Join_1">
+  <attributes>
+    <attribute id="NAME" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="NAME"/>
+      <keyMapping columnObjectName="Join_1" columnName="NAME"/>
+    </attribute>
+    <attribute id="PRODUCT_ID" order="2">
+      <descriptions defaultDescription="PRODUCT_ID"/>
+      <keyMapping columnObjectName="Join_1" columnName="PRODUCT_ID"/>
+    </attribute>
+    <attribute id="QUANTITY" order="3">
+      <descriptions defaultDescription="QUANTITY"/>
+      <keyMapping columnObjectName="Join_1" columnName="QUANTITY"/>
+    </attribute>
+    <attribute id="UNIT_PRICE" order="4">
+      <descriptions defaultDescription="UNIT_PRICE"/>
+      <keyMapping columnObjectName="Join_1" columnName="UNIT_PRICE"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures>
+    <measure id="REVENUE" hidden="false" order="5" aggregationType="sum" measureType="simple" datatype="INTEGER" expressionLanguage="SQL">
+      <descriptions defaultDescription="Revenue"/>
+      <formula>&quot;QUANTITY&quot; * &quot;UNIT_PRICE&quot;</formula>
+      
+      <exceptionAggregationMetadata>
+        <attribute attributeName="QUANTITY"/>
+        <attribute attributeName="UNIT_PRICE"/>
+      </exceptionAggregationMetadata>
+    </measure>
+    <measure id="TOTAL_QUANTITY" order="6" aggregationType="sum" measureType="simple" datatype="INTEGER" expressionLanguage="SQL">
+      <descriptions defaultDescription="Total Quantity"/>
+      <formula>&quot;QUANTITY&quot;</formula>
+      
+      <exceptionAggregationMetadata>
+        <attribute attributeName="QUANTITY"/>
+      </exceptionAggregationMetadata>
+    </measure>
+  </calculatedMeasures>
+  <restrictedMeasures/>
+  <localDimensions/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+    
+  
+    <shape expanded="true" modelObjectName="Join_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="100" y="203"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="com.sap.training.sales.core::sales_order_item" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="289" y="216"/>
+      <rectangleSize width="328.779296875"/>
+    </shape>
+    <shape modelObjectName="com.sap.training.sales.core::product" modelObjectNameSpace="Join_1" modelObjectType="JoinNodeInput" multiJoinViewNodeName="Join_1">
+      <upperLeftCorner x="1220" y="30"/>
+      <rectangleSize width="274.71484375"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>
