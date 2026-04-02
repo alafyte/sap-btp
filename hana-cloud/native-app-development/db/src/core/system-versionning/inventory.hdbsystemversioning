@@ -1,0 +1,1 @@
+SYSTEM VERSIONING "com.sap.training.sales.core::inventory"(VALIDFROM, VALIDTO) HISTORY TABLE "com.sap.training.sales.core::inventory_history" NOT VALIDATED
