@@ -1,0 +1,7 @@
+PROJECTION VIEW "com.sap.training.sales.analytics::customer_pv"
+AS
+SELECT
+    CUSTOMER_ID,
+    NAME,
+    EMAIL
+FROM "<schema>"."<object>"

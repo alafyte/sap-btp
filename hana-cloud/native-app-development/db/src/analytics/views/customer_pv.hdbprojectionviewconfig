@@ -1,0 +1,7 @@
+{
+  "com.sap.training.sales.analytics::customer_pv" : {
+    "target" : {
+      "object"   : "com.sap.training.sales.core::customer"
+    }
+  }
+}

@@ -153,3 +153,9 @@ SELECT * FROM "com.sap.training.sales.core::inventory_history";
 https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/sql-views-hdbview
 
 https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d5fa9b75191014a33eee92692f1702.html
+
+## Projection Views
+
+https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/projection-views-hdbprojectionview-and-hdbprojectionviewconfig
+
+https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/e35411b417a94f199679b9f9f45c2306.html
