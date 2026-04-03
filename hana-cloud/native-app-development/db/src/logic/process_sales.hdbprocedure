@@ -1,0 +1,7 @@
+PROCEDURE "com.sap.training.sales.logic::process_sales"(OUT total_orders INTEGER)
+   LANGUAGE SQLSCRIPT
+   SQL SECURITY INVOKER
+   READS SQL DATA AS
+BEGIN
+   SELECT COUNT(*) INTO total_orders FROM "com.sap.training.sales.core::sales_order";
+END

@@ -149,21 +149,21 @@ SELECT * FROM "com.sap.training.sales.core::inventory_history";
 -- output row2: 1001, WH1, 100, 2, ..., ...
 ```
 
-## SQL Views
+# SQL Views
 https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/sql-views-hdbview
 
 https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d5fa9b75191014a33eee92692f1702.html
 
-## Projection Views
+# Projection Views
 
 https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/projection-views-hdbprojectionview-and-hdbprojectionviewconfig
 
 https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/e35411b417a94f199679b9f9f45c2306.html
 
-## Calculation Views
+# Calculation Views
 https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/calculation-views-hdbcalculationview
 
-## Result cache
+# Result cache
 
 https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/result-caches-hdbresultcache
 
@@ -172,3 +172,37 @@ https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/3bc
 
 See <cache_clause>:
 https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/9d274fa7e20d4841a6017e020d871aa0.html?locale=en-US&state=PRODUCTION&version=2.0.08&q=result%20cache
+
+# Procedure
+
+https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/procedures-hdbprocedure
+
+https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d467407519101484f190f545d54b24.html?locale=en-US&state=PRODUCTION&version=LATEST
+
+## Usage Example
+```sql
+CALL "com.sap.training.sales.logic::process_sales"(TOTAL_ORDERS => ?)
+```
+
+# Function
+
+https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/functions-hdbfunction
+
+https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/20d42e77751910149f0ff6b879b1290f.html?locale=en-US&state=PRODUCTION&version=LATEST
+
+## Usage Example
+```sql
+SELECT * FROM "com.sap.training.sales.logic::get_top_customers"(3);
+```
+
+# Library
+
+https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/libraries-hdblibrary
+
+https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/62263ce35ac74488a397553fcb25a7d6.html?locale=en-US&state=PRODUCTION&version=LATEST
+
+## Usage Example
+
+```sql
+SUM("com.sap.training.sales.logic::math_utils":calculate_discount(i.QUANTITY * i.UNIT_PRICE, i.DISCOUNT)) AS TOTAL_REVENUE
+```

@@ -1,0 +1,11 @@
+LIBRARY "com.sap.training.sales.logic::math_utils"
+LANGUAGE SQLSCRIPT
+AS
+BEGIN
+PUBLIC FUNCTION calculate_discount(price DECIMAL(15,2), discount DECIMAL(5,2))
+    RETURNS result DECIMAL(15,2)
+    AS
+    BEGIN
+        result := :price * (1 - :discount / 100);
+    END;
+END

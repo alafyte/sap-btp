@@ -1,0 +1,25 @@
+FUNCTION "com.sap.training.sales.logic::get_top_customers"(IN top_n INTEGER)
+    RETURNS TABLE (
+    CUSTOMER_ID   INTEGER,
+    CUSTOMER_NAME NVARCHAR(100),
+    TOTAL_REVENUE DECIMAL(15,2)
+)
+    LANGUAGE SQLSCRIPT
+    SQL SECURITY INVOKER AS
+BEGIN
+    RETURN
+    SELECT
+        c.CUSTOMER_ID,
+        c.NAME AS CUSTOMER_NAME,
+        SUM("com.sap.training.sales.logic::math_utils":calculate_discount(i.QUANTITY * i.UNIT_PRICE, i.DISCOUNT)) AS TOTAL_REVENUE
+    FROM "com.sap.training.sales.core::sales_order_item" i
+    JOIN "com.sap.training.sales.core::sales_order" o
+        ON i.ORDER_ID = o.ORDER_ID
+    JOIN "com.sap.training.sales.core::customer" c
+        ON o.CUSTOMER_ID = c.CUSTOMER_ID
+    GROUP BY
+        c.CUSTOMER_ID,
+        c.NAME
+    ORDER BY TOTAL_REVENUE DESC
+    LIMIT :top_n;
+END;
