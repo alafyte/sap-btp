@@ -1,0 +1,3 @@
+RESULT CACHE "_SYS_CACHE#com.sap.training.sales.analytics::sales_analytics_view"
+ ON VIEW "com.sap.training.sales.analytics::sales_analytics_view"
+ WITH RETENTION 30

@@ -162,3 +162,13 @@ https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/e35
 
 ## Calculation Views
 https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/calculation-views-hdbcalculationview
+
+## Result cache
+
+https://help.sap.com/docs/hana-cloud-database/sap-hana-cloud-sap-hana-database-deployment-infrastructure-hdi-reference/result-caches-hdbresultcache
+
+
+https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/3bc89515b93d4844bd700b3492673270.html?locale=en-US&state=PRODUCTION&version=LATEST&q=result+cache
+
+See <cache_clause>:
+https://help.sap.com/docs/SAP_HANA_PLATFORM/4fe29514fd584807ac9f2a04f6754767/9d274fa7e20d4841a6017e020d871aa0.html?locale=en-US&state=PRODUCTION&version=2.0.08&q=result%20cache
