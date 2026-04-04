@@ -12,14 +12,36 @@
 <calculationViews>
   <calculationView xsi:type="Calculation:ProjectionView" id="Projection_1" filterExpressionLanguage="SQL">
     <viewAttributes>
-      <viewAttribute id="DATE_SQL"/>
-      <viewAttribute id="YEAR"/>
-      <viewAttribute id="QUARTER"/>
-      <viewAttribute id="MONTH"/>
-      <viewAttribute id="WEEK"/>
-      <viewAttribute id="DAY"/>
-    </viewAttributes>
-    <calculatedViewAttributes/><input node="com.sap.training.analytics::M_TIME_DIMENSION"/></calculationView>
+        <viewAttribute id="DATETIMESTAMP"/>
+        <viewAttribute id="DATE_SQL"/>
+        <viewAttribute id="DATETIME_SAP"/>
+        <viewAttribute id="DATE_SAP"/>
+        <viewAttribute id="YEAR"/>
+        <viewAttribute id="QUARTER"/>
+        <viewAttribute id="MONTH"/>
+        <viewAttribute id="WEEK"/>
+        <viewAttribute id="WEEK_YEAR"/>
+        <viewAttribute id="DAY_OF_WEEK"/>
+        <viewAttribute id="DAY"/>
+        <viewAttribute id="HOUR"/>
+        <viewAttribute id="MINUTE"/>
+        <viewAttribute id="SECOND"/>
+        <viewAttribute id="CALQUARTER"/>
+        <viewAttribute id="CALMONTH"/>
+        <viewAttribute id="CALWEEK"/>
+        <viewAttribute id="YEAR_INT"/>
+        <viewAttribute id="QUARTER_INT"/>
+        <viewAttribute id="MONTH_INT"/>
+        <viewAttribute id="WEEK_INT"/>
+        <viewAttribute id="WEEK_YEAR_INT"/>
+        <viewAttribute id="DAY_OF_WEEK_INT"/>
+        <viewAttribute id="DAY_INT"/>
+        <viewAttribute id="TZNTSTMPS"/>
+        <viewAttribute id="TZNTSTMPL"/>
+        </viewAttributes>
+    <calculatedViewAttributes/><input node="com.sap.training.analytics::M_TIME_DIMENSION"/>
+    <filter>(&quot;HOUR&quot;='00') AND (&quot;SECOND&quot;='00') AND (&quot;MINUTE&quot;='00')</filter>
+  </calculationView>
 </calculationViews>
 <inlineHierarchy xsi:type="Dimension:LeveledHierarchy" id="Gregorian_Hierarchy" aggregateAllNodes="false" orphanedNodesHandling="ROOT_NODES" nodeStyle="NAME_PATH" cacheEnabled="true" cycleHandling="BREAKUP" emptyValueIsNull="true">
                                 <descriptions defaultDescription="Gregorian_Hierarchy"/>
@@ -27,8 +49,6 @@
     <level levelAttribute="YEAR" levelType="MDLEVEL_TYPE_REGULAR" order="1" orderAttribute="YEAR" sortDirection="ASC"/>
     <level levelAttribute="QUARTER" levelType="MDLEVEL_TYPE_REGULAR" order="2" orderAttribute="QUARTER" sortDirection="ASC"/>
     <level levelAttribute="MONTH" levelType="MDLEVEL_TYPE_REGULAR" order="3" orderAttribute="MONTH" sortDirection="ASC"/>
-    <level levelAttribute="WEEK" levelType="MDLEVEL_TYPE_REGULAR" order="4" orderAttribute="WEEK" sortDirection="ASC"/>
-    <level levelAttribute="DAY" levelType="MDLEVEL_TYPE_REGULAR" order="5" orderAttribute="DAY" sortDirection="ASC"/>
   </levels>
 </inlineHierarchy>
 <logicalModel id="Projection_1">
@@ -49,14 +69,6 @@
       <descriptions defaultDescription="MONTH"/>
       <keyMapping columnObjectName="Projection_1" columnName="MONTH"/>
     </attribute>
-    <attribute id="WEEK" order="5" displayAttribute="false" attributeHierarchyActive="false">
-      <descriptions defaultDescription="WEEK"/>
-      <keyMapping columnObjectName="Projection_1" columnName="WEEK"/>
-    </attribute>
-    <attribute id="DAY" order="6" displayAttribute="false" attributeHierarchyActive="false">
-      <descriptions defaultDescription="DAY"/>
-      <keyMapping columnObjectName="Projection_1" columnName="DAY"/>
-    </attribute>
   </attributes>
   <calculatedAttributes/>
   <baseMeasures/>
@@ -69,7 +81,9 @@
       <upperLeftCorner x="40" y="85"/>
     </shape>
     <shape expanded="true" modelObjectName="Projection_1" modelObjectNameSpace="CalculationView">
-    <upperLeftCorner x="40" y="185"/>
+    <upperLeftCorner x="40" y="227"/>
+    
+      <rectangleSize width="160"/>
     </shape>
   </shapes>
 </layout>
