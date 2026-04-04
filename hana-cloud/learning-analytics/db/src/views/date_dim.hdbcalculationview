@@ -19,9 +19,7 @@
       <viewAttribute id="WEEK"/>
       <viewAttribute id="DAY"/>
     </viewAttributes>
-    <calculatedViewAttributes/><input node="com.sap.training.analytics::M_TIME_DIMENSION"/>
-    <filter>(&quot;HOUR&quot;='00') AND (&quot;SECOND&quot;='00') AND (&quot;MINUTE&quot;='00')</filter>
-  </calculationView>
+    <calculatedViewAttributes/><input node="com.sap.training.analytics::M_TIME_DIMENSION"/></calculationView>
 </calculationViews>
 <inlineHierarchy xsi:type="Dimension:LeveledHierarchy" id="Gregorian_Hierarchy" aggregateAllNodes="false" orphanedNodesHandling="ROOT_NODES" nodeStyle="NAME_PATH" cacheEnabled="true" cycleHandling="BREAKUP" emptyValueIsNull="true">
                                 <descriptions defaultDescription="Gregorian_Hierarchy"/>

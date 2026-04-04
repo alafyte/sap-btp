@@ -1,0 +1,16 @@
+PRODUCT_ID,PRODUCT_NAME,CATEGORY,SUBCATEGORY,BRAND,PRICE,PRODUCT_LINE,LAUNCH_YEAR
+100,Laptop A,Electronics,Computers,BrandX,1000,Premium,2021
+101,Laptop B,Electronics,Computers,BrandY,800,Standard,2022
+102,Phone A,Electronics,Mobile,BrandX,600,Premium,2023
+103,Chair,Furniture,Office,BrandZ,150,Standard,2020
+104,Desk,Furniture,Office,BrandZ,300,Standard,2019
+105,Tablet A,Electronics,Mobile,BrandY,500,Standard,2022
+106,Monitor,Electronics,Accessories,BrandX,250,Standard,2021
+107,Keyboard,Electronics,Accessories,BrandZ,50,Standard,2020
+108,Mouse,Electronics,Accessories,BrandZ,30,Standard,2020
+109,Phone B,Electronics,Mobile,BrandY,700,Premium,2023
+110,Laptop C,Electronics,Computers,BrandX,1200,Premium,2023
+111,Printer,Electronics,Office,BrandY,200,Standard,2021
+112,Scanner,Electronics,Office,BrandZ,180,Standard,2021
+113,Sofa,Furniture,Home,BrandZ,900,Premium,2018
+114,Lamp,Furniture,Home,BrandZ,80,Standard,2020

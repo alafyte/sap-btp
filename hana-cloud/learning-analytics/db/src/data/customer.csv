@@ -1,0 +1,16 @@
+CUSTOMER_ID,CUSTOMER_NAME,CITY,COUNTRY,SEGMENT,INDUSTRY,CUSTOMER_SINCE
+1,Alice Corp,Berlin,DE,EU,B2B,2018
+2,Bob Ltd,Prague,CZ,EU,B2C,2020
+3,Carlos SA,Madrid,ES,EU,B2B,2015
+4,Delta Inc,New York,US,NA,B2C,2022
+5,Echo GmbH,Hamburg,DE,EU,B2B,2017
+6,Foxtrot SRL,Rome,IT,EU,B2C,2019
+7,Gamma LLC,Chicago,US,NA,B2B,2016
+8,Helios SA,Paris,FR,EU,B2C,2021
+9,Indigo Ltd,London,UK,EU,B2B,2014
+10,Juliet BV,Amsterdam,NL,EU,B2C,2023
+11,Kappa Oy,Helsinki,FI,EU,B2B,2012
+12,Lambda AB,Stockholm,SE,EU,B2C,2018
+13,Matrix Inc,San Francisco,US,NA,B2B,2019
+14,Nova SA,Lisbon,PT,EU,B2C,2020
+15,Orion GmbH,Munich,DE,EU,B2B,2016

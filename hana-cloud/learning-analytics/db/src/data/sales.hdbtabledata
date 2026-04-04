@@ -1,0 +1,26 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "com.sap.training.analytics::sales",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "com.sap.training.analytics::sales.csv",
+        "has_header": true
+      },
+      "import_settings": {
+        "import_columns": [
+          "SALE_ID",
+          "PRODUCT_ID",
+          "CUSTOMER_ID",
+          "STORE_ID",
+          "DATE_ID",
+          "QUANTITY",
+          "AMOUNT",
+          "DISCOUNT",
+          "CURRENCY"
+        ]
+      }
+    }
+  ]
+}
