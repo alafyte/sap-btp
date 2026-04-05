@@ -13,7 +13,6 @@
           "SALE_ID",
           "PRODUCT_ID",
           "CUSTOMER_ID",
-          "STORE_ID",
           "DATE_ID",
           "QUANTITY",
           "AMOUNT",

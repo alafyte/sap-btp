@@ -14,3 +14,20 @@ CUSTOMER_ID,CUSTOMER_NAME,CITY,COUNTRY,SEGMENT,INDUSTRY,CUSTOMER_SINCE
 13,Matrix Inc,San Francisco,US,NA,B2B,2019
 14,Nova SA,Lisbon,PT,EU,B2C,2020
 15,Orion GmbH,Munich,DE,EU,B2B,2016
+16,Phoenix SA,Sao Paulo,BR,LATAM,B2B,2017
+17,Quasar Ltd,Mexico City,MX,LATAM,B2C,2021
+18,Raptor Inc,Toronto,CA,NA,B2B,2013
+19,Sigma Co,Buenos Aires,AR,LATAM,B2C,2022
+20,Titan LLC,Sydney,AU,APJ,B2B,2019
+21,Umbra KK,Tokyo,JP,APJ,B2C,2015
+22,Vega Pvt,Mumbai,IN,APJ,B2B,2018
+23,Wave Ltd,Seoul,KR,APJ,B2C,2020
+24,Xenon GmbH,Vienna,AT,EU,B2B,2011
+25,Yotta SA,Zurich,CH,EU,B2C,2016
+26,Zenith BV,Brussels,BE,EU,B2B,2019
+27,Atlas Inc,Los Angeles,US,NA,B2C,2023
+28,Boreal AS,Oslo,NO,EU,B2B,2014
+29,Cosmos Ltd,Dublin,IE,EU,B2C,2022
+30,Draco SA,Santiago,CL,LATAM,B2B,2017
+31,Neptune Corp,Warsaw,PL,EU,B2B,2024
+32,Orbit Ltd,Copenhagen,DK,EU,B2C,2023

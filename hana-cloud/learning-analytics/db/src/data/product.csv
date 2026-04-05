@@ -1,16 +1,32 @@
 PRODUCT_ID,PRODUCT_NAME,CATEGORY,SUBCATEGORY,BRAND,PRICE,PRODUCT_LINE,LAUNCH_YEAR
 100,Laptop A,Electronics,Computers,BrandX,1000,Premium,2021
 101,Laptop B,Electronics,Computers,BrandY,800,Standard,2022
-102,Phone A,Electronics,Mobile,BrandX,600,Premium,2023
+102,Phone A,Electronics,Mobile,BrandX,650,Premium,2023
 103,Chair,Furniture,Office,BrandZ,150,Standard,2020
-104,Desk,Furniture,Office,BrandZ,300,Standard,2019
-105,Tablet A,Electronics,Mobile,BrandY,500,Standard,2022
-106,Monitor,Electronics,Accessories,BrandX,250,Standard,2021
-107,Keyboard,Electronics,Accessories,BrandZ,50,Standard,2020
-108,Mouse,Electronics,Accessories,BrandZ,30,Standard,2020
-109,Phone B,Electronics,Mobile,BrandY,700,Premium,2023
-110,Laptop C,Electronics,Computers,BrandX,1200,Premium,2023
-111,Printer,Electronics,Office,BrandY,200,Standard,2021
-112,Scanner,Electronics,Office,BrandZ,180,Standard,2021
-113,Sofa,Furniture,Home,BrandZ,900,Premium,2018
-114,Lamp,Furniture,Home,BrandZ,80,Standard,2020
+104,Desk,Furniture,Office,BrandZ,320,Standard,2019
+105,Tablet A,Electronics,Mobile,BrandY,520,Standard,2022
+106,Monitor,Electronics,Accessories,BrandX,260,Standard,2021
+107,Keyboard,Electronics,Accessories,BrandZ,55,Standard,2020
+108,Mouse,Electronics,Accessories,BrandZ,35,Standard,2020
+109,Phone B,Electronics,Mobile,BrandY,720,Premium,2023
+110,Laptop C,Electronics,Computers,BrandX,1250,Premium,2023
+111,Printer,Electronics,Office,BrandY,210,Standard,2021
+112,Scanner,Electronics,Office,BrandZ,190,Standard,2021
+113,Sofa,Furniture,Home,BrandZ,950,Premium,2018
+114,Lamp,Furniture,Home,BrandZ,90,Standard,2020
+115,Gaming Laptop,Electronics,Computers,BrandX,1800,Premium,2024
+116,Budget Laptop,Electronics,Computers,BrandY,500,Economy,2022
+117,Smartphone Lite,Electronics,Mobile,BrandX,300,Economy,2023
+118,Smartphone Pro Max,Electronics,Mobile,BrandY,1100,Premium,2024
+119,Ergonomic Chair,Furniture,Office,BrandZ,400,Premium,2023
+120,Standing Desk,Furniture,Office,BrandZ,600,Premium,2022
+121,Bookshelf,Furniture,Home,BrandZ,200,Standard,2021
+122,LED TV,Electronics,Home Entertainment,BrandX,900,Premium,2023
+123,Soundbar,Electronics,Home Entertainment,BrandY,350,Standard,2022
+124,Headphones,Electronics,Accessories,BrandX,150,Standard,2023
+125,Wireless Earbuds,Electronics,Accessories,BrandY,220,Premium,2024
+126,Webcam,Electronics,Accessories,BrandZ,120,Standard,2022
+127,Router,Electronics,Networking,BrandX,180,Standard,2021
+128,Smartwatch,Electronics,Wearables,BrandY,300,Premium,2023
+129,Fitness Tracker,Electronics,Wearables,BrandZ,120,Standard,2022
+130,Coffee Table,Furniture,Home,BrandZ,250,Standard,2019
