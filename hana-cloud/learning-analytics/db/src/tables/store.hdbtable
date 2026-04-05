@@ -1,7 +1,0 @@
-COLUMN TABLE "com.sap.training.analytics::store" (
-  STORE_ID INTEGER,
-  STORE_NAME NVARCHAR(100),
-  CITY NVARCHAR(50),
-  REGION NVARCHAR(50),
-  PRIMARY KEY (STORE_ID)
-)
