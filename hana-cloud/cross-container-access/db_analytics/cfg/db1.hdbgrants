@@ -1,0 +1,14 @@
+{
+	"ServiceName_1": {
+		"object_owner": {
+			"container_roles": [
+				"com.sap.training.cross.container::CORE_EXTERNAL_ACCESS#"
+			]
+		},
+		"application_user": {
+			"container_roles": [
+				"com.sap.training.cross.container::external_access_app"
+			]
+		}
+	}
+}

@@ -1,0 +1,7 @@
+VIEW "com.sap.training.cross.container.analytics::customer_totals"
+AS
+SELECT 
+  CUSTOMER_ID,
+  SUM(AMOUNT) AS TOTAL_AMOUNT
+FROM "com.sap.training.cross.container.analytics::customer_orders"
+GROUP BY CUSTOMER_ID;

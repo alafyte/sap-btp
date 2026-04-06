@@ -1,0 +1,8 @@
+{
+  "com.sap.training.cross.container.analytics::customer_orders": {
+    "target": {
+      "object": "com.sap.training.cross.container::customer_orders",
+      "schema": "_PLACEHOLDER_"
+    }
+  }
+}
