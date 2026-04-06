@@ -1,0 +1,13 @@
+{
+    "role": {
+        "name": "com.sap.training.cross.container::external_access_app",
+        "schema_privileges": [
+            {
+                "privileges": [
+                    "SELECT",
+                    "SELECT METADATA"
+                ]
+            }
+        ]
+    }
+}
