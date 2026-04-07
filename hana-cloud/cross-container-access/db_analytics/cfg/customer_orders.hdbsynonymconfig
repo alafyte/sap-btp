@@ -1,5 +1,5 @@
 {
-  "com.sap.training.cross.container.analytics::customer_orders": {
+  "com.sap.training.cross.container.analytics::CUSTOMER_ORDERS": {
     "target": {
       "object": "com.sap.training.cross.container::CUSTOMER_ORDERS",
       "schema.configure": "ServiceName_1/schema"

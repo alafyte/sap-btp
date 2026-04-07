@@ -2,12 +2,12 @@
 	"ServiceName_1": {
 		"object_owner": {
 			"container_roles": [
-				"com.sap.training.cross.container::CORE_EXTERNAL_ACCESS#"
+				"com.sap.training.cross.container::CORE_DB_EXTERNAL_ACCESS_G#"
 			]
 		},
 		"application_user": {
 			"container_roles": [
-				"com.sap.training.cross.container::external_access_app"
+				"com.sap.training.cross.container::CORE_DB_EXTERNAL_ACCESS"
 			]
 		}
 	}

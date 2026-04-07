@@ -4,6 +4,6 @@ SELECT
   C.NAME,
   O.ORDER_ID,
   O.AMOUNT
-FROM "com.sap.training.cross.container::customers" C
-JOIN "com.sap.training.cross.container::orders" O
+FROM "com.sap.training.cross.container::CUSTOMERS" C
+JOIN "com.sap.training.cross.container::ORDERS" O
   ON C.CUSTOMER_ID = O.CUSTOMER_ID;
