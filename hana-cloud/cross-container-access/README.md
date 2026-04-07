@@ -1,6 +1,4 @@
-https://www.erpqna.com/how-to-share-tables-across-different-cap-projects/
-
-# Plain schema access
+# Plain schema access 
 https://community.sap.com/t5/technology-blog-posts-by-sap/cross-hdi-container-access-using-user-provided-service-for-containers/ba-p/13540097
 
 ## Plain schema creation
@@ -34,5 +32,13 @@ grant CCROLE to PLUSR with admin option;
 cf cups PLAIN_ACCESS_GRANT -p "{\"user\":\"PLUSR\",\"password\":\"HanaRocks01\",\"tags\":[\"hana\"] , \"schema\" : \"PLAIN\" }"
 ```
 
+> Note: the similar flow is applicable for the objects and users of HDI container deployed to a different CF space.
+
 # Container to Container
 https://community.sap.com/t5/technology-blog-posts-by-sap/working-with-cross-hdi-container-access-scenarios-in-sap-hana-cloud/ba-p/13539139
+
+# Container to Container from a different HANA Cloud instance
+https://community.sap.com/t5/technology-blog-posts-by-sap/cross-hdi-container-access-using-virtual-tables-for-containers-located-in/ba-p/13540215
+
+# SAP CAP example
+https://www.erpqna.com/how-to-share-tables-across-different-cap-projects/ 
