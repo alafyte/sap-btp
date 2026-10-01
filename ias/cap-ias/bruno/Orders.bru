@@ -1,0 +1,40 @@
+meta {
+  name: Orders
+  type: http
+  seq: 1
+}
+
+get {
+  url: https://e954e80etrial-dev-order-service-srv.cfapps.us10-001.hana.ondemand.com/orders/Orders?$expand=items
+  body: formUrlEncoded
+  auth: oauth2
+}
+
+params:query {
+  $expand: items
+}
+
+auth:oauth2 {
+  grant_type: authorization_code
+  callback_url: https://e954e80etrial-dev-order-service.cfapps.us10-001.hana.ondemand.com/login/callback
+  authorization_url: https://adcwfi1ue.trial-accounts.ondemand.com/oauth2/authorize
+  access_token_url: https://adcwfi1ue.trial-accounts.ondemand.com/oauth2/token
+  refresh_token_url: 
+  client_id: f41106d8-23bf-459f-9416-aad55d636847
+  client_secret: {{process.env.CLIENT_SECRET}}
+  scope: openid
+  state: 
+  pkce: false
+  credentials_placement: body
+  credentials_id: credentials
+  token_source: access_token
+  token_placement: header
+  token_header_prefix: Bearer
+  auto_fetch_token: true
+  auto_refresh_token: false
+}
+
+settings {
+  encodeUrl: true
+  timeout: 0
+}

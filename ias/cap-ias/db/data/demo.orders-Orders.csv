@@ -1,0 +1,4 @@
+ID,customerName,status,totalAmount,currency_code,createdAt,createdBy,modifiedAt,modifiedBy
+11111111-1111-1111-1111-111111111111,Acme Corporation,OPEN,1250.00,EUR,2001-09-30T00:00:00.000Z,createdBy.6410@example.org,2014-12-23T00:00:00.000Z,modifiedBy.6410@example.org
+22222222-2222-2222-2222-222222222222,Example Industries,OPEN,850.00,EUR,2009-12-29T00:00:00.000Z,createdBy.6411@example.org,2007-08-15T00:00:00.000Z,modifiedBy.6411@example.com
+
