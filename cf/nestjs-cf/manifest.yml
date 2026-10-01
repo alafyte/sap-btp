@@ -1,0 +1,9 @@
+---
+applications:
+  - name: user-management
+    command: npm run start:prod
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    services:
+      - postgres-db
