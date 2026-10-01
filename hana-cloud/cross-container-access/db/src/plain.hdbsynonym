@@ -1,0 +1,14 @@
+{
+  "com.sap.training.cross.container::CUSTOMERS": {
+    "target": {
+      "object": "CUSTOMERS",
+      "schema": "_PLACEHOLDER_"
+    }
+  },
+  "com.sap.training.cross.container::ORDERS": {
+    "target": {
+      "object": "ORDERS",
+      "schema": "_PLACEHOLDER_"
+    }
+  }
+}

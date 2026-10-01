@@ -1,0 +1,22 @@
+{
+	"PLAIN_ACCESS_GRANT": {
+		"application_user": {
+			"global_roles": [
+				{
+					"roles": [
+						"CCROLE"
+					]
+				}
+			]
+		},
+		"object_owner": {
+			"global_roles": [
+				{
+					"roles": [
+						"CCROLE"
+					]
+				}
+			]
+		}
+	}
+}
