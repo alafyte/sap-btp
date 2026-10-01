@@ -1,0 +1,25 @@
+{
+  "format_version": 1,
+  "imports": [
+    {
+      "target_table": "com.sap.training.analytics::product",
+      "source_data": {
+        "data_type": "CSV",
+        "file_name": "com.sap.training.analytics::product.csv",
+        "has_header": true
+      },
+      "import_settings": {
+        "import_columns": [
+          "PRODUCT_ID",
+          "PRODUCT_NAME",
+          "CATEGORY",
+          "SUBCATEGORY",
+          "BRAND",
+          "PRICE",
+          "PRODUCT_LINE",
+          "LAUNCH_YEAR"
+        ]
+      }
+    }
+  ]
+}

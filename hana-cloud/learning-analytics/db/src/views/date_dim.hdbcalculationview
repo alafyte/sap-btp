@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" xmlns:Dimension="http://www.sap.com/ndb/BiModelDimension.ecore" id="com.sap.training.analytics::date_dim" applyPrivilegeType="NONE" dataCategory="DIMENSION" dimensionType="TIME" schemaVersion="3.0" hierarchyGeneration="SQL" outputViewType="Projection" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" application="BAS">
+<descriptions defaultDescription="date_dim"/>
+<localVariables/>
+<variableMappings/>
+<dataSources>
+  <DataSource id="com.sap.training.analytics::M_TIME_DIMENSION">
+    <resourceUri>com.sap.training.analytics::M_TIME_DIMENSION</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Projection_1" filterExpressionLanguage="SQL">
+    <viewAttributes>
+        <viewAttribute id="DATETIMESTAMP"/>
+        <viewAttribute id="DATE_SQL"/>
+        <viewAttribute id="DATETIME_SAP"/>
+        <viewAttribute id="DATE_SAP"/>
+        <viewAttribute id="YEAR"/>
+        <viewAttribute id="QUARTER"/>
+        <viewAttribute id="MONTH"/>
+        <viewAttribute id="WEEK"/>
+        <viewAttribute id="WEEK_YEAR"/>
+        <viewAttribute id="DAY_OF_WEEK"/>
+        <viewAttribute id="DAY"/>
+        <viewAttribute id="HOUR"/>
+        <viewAttribute id="MINUTE"/>
+        <viewAttribute id="SECOND"/>
+        <viewAttribute id="CALQUARTER"/>
+        <viewAttribute id="CALMONTH"/>
+        <viewAttribute id="CALWEEK"/>
+        <viewAttribute id="YEAR_INT"/>
+        <viewAttribute id="QUARTER_INT"/>
+        <viewAttribute id="MONTH_INT"/>
+        <viewAttribute id="WEEK_INT"/>
+        <viewAttribute id="WEEK_YEAR_INT"/>
+        <viewAttribute id="DAY_OF_WEEK_INT"/>
+        <viewAttribute id="DAY_INT"/>
+        <viewAttribute id="TZNTSTMPS"/>
+        <viewAttribute id="TZNTSTMPL"/>
+        </viewAttributes>
+    <calculatedViewAttributes/><input node="com.sap.training.analytics::M_TIME_DIMENSION"/>
+    <filter>(&quot;HOUR&quot;='00') AND (&quot;SECOND&quot;='00') AND (&quot;MINUTE&quot;='00')</filter>
+  </calculationView>
+</calculationViews>
+<inlineHierarchy xsi:type="Dimension:LeveledHierarchy" id="Gregorian_Hierarchy" aggregateAllNodes="false" orphanedNodesHandling="ROOT_NODES" nodeStyle="NAME_PATH" cacheEnabled="true" cycleHandling="BREAKUP" emptyValueIsNull="true">
+                                <descriptions defaultDescription="Gregorian_Hierarchy"/>
+  <levels>
+    <level levelAttribute="YEAR" levelType="MDLEVEL_TYPE_REGULAR" order="1" orderAttribute="YEAR" sortDirection="ASC"/>
+    <level levelAttribute="QUARTER" levelType="MDLEVEL_TYPE_REGULAR" order="2" orderAttribute="QUARTER" sortDirection="ASC"/>
+    <level levelAttribute="MONTH" levelType="MDLEVEL_TYPE_REGULAR" order="3" orderAttribute="MONTH" sortDirection="ASC"/>
+  </levels>
+</inlineHierarchy>
+<logicalModel id="Projection_1">
+  <attributes>
+    <attribute id="DATE_SQL" order="1" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="DATE_SQL"/>
+      <keyMapping columnObjectName="Projection_1" columnName="DATE_SQL"/>
+    </attribute>
+    <attribute id="YEAR" order="2" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="YEAR"/>
+      <keyMapping columnObjectName="Projection_1" columnName="YEAR"/>
+    </attribute>
+    <attribute id="QUARTER" order="3" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="QUARTER"/>
+      <keyMapping columnObjectName="Projection_1" columnName="QUARTER"/>
+    </attribute>
+    <attribute id="MONTH" order="4" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="MONTH"/>
+      <keyMapping columnObjectName="Projection_1" columnName="MONTH"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures/>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Projection_1" modelObjectNameSpace="CalculationView">
+    <upperLeftCorner x="40" y="227"/>
+    
+      <rectangleSize width="160"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>

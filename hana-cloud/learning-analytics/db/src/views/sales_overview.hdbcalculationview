@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Calculation:scenario xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:Calculation="http://www.sap.com/ndb/BiModelCalculation.ecore" id="com.sap.training.analytics::sales_overview" applyPrivilegeType="NONE" dataCategory="CUBE" schemaVersion="3.0" hierarchyGeneration="SQL" cacheInvalidationPeriod="NONE" enforceSqlExecution="true" application="BAS">
+<descriptions defaultDescription="sales_overview"/>
+<localVariables>
+  <variable id="IP_O_TARGET_CURRENCY" parameter="true">
+    <descriptions defaultDescription="IP_O_TARGET_CURRENCY"/>
+    <variableProperties datatype="NVARCHAR" length="3" mandatory="true" defaultValue="EUR">
+      <valueDomain type="Currency"/>
+      <selection multiLine="false" type="SingleValue"/>
+    </variableProperties>
+  </variable>
+</localVariables>
+<variableMappings/>
+<dataSources>
+  <DataSource id="com.sap.training.analytics::sales">
+    <resourceUri>com.sap.training.analytics::sales</resourceUri>
+  </DataSource>
+</dataSources>
+<snapshotProcedures/>
+<calculationViews>
+  <calculationView xsi:type="Calculation:ProjectionView" id="Projection_1">
+    <viewAttributes>
+      <viewAttribute id="SALE_ID"/>
+      <viewAttribute id="PRODUCT_ID"/>
+      <viewAttribute id="CUSTOMER_ID"/>
+      <viewAttribute id="DATE_ID"/>
+      <viewAttribute id="QUANTITY"/>
+      <viewAttribute id="AMOUNT"/>
+      <viewAttribute id="DISCOUNT"/>
+      <viewAttribute id="CURRENCY"/>
+    </viewAttributes>
+    <calculatedViewAttributes/>
+    <input node="com.sap.training.analytics::sales"/>
+  </calculationView>
+</calculationViews>
+
+<logicalModel id="Projection_1">
+  <attributes>
+    <attribute id="CURRENCY" order="3" semanticType="currencyCode" displayAttribute="false" attributeHierarchyActive="false">
+      <descriptions defaultDescription="CURRENCY"/>
+      <keyMapping columnObjectName="Projection_1" columnName="CURRENCY"/>
+    </attribute>
+    <attribute id="PRODUCT_ID$local">
+      <descriptions defaultDescription="PRODUCT_ID"/>
+      <keyMapping columnObjectName="Projection_1" columnName="PRODUCT_ID"/>
+    </attribute>
+    <attribute id="CUSTOMER_ID$local">
+      <keyMapping columnObjectName="Projection_1" columnName="CUSTOMER_ID"/>
+    </attribute>
+    <attribute id="DATE_ID$local">
+      <keyMapping columnObjectName="Projection_1" columnName="DATE_ID"/>
+    </attribute>
+  </attributes>
+  <calculatedAttributes/>
+  <baseMeasures>
+    <measure id="AMOUNT" order="1" aggregationType="sum" measureType="amount" semanticType="amount" unconverted="false">
+      <descriptions defaultDescription="AMOUNT"/>
+      <unitCurrencyAttribute attributeName="AMOUNT_CURRENCY"/>
+      <currencyConversion errorHandling="failOnError" generateOutputUnitCurrencyAttribute="true" outputUnitCurrencyAttributeName="AMOUNT_CURRENCY" convert="true" accuracy="COMPATIBILITY" method="ERP" lookup="REGULAR">
+        <client>
+          <value>000</value>
+        </client>
+        <currencyConversionTables rates="com.sap.training.analytics::TCURR" configuration="com.sap.training.analytics::TCURV" prefactors="com.sap.training.analytics::TCURF" notations="com.sap.training.analytics::TCURN" precisions="com.sap.training.analytics::TCURX"/>
+        <outputDataType datatype="DECIMAL" length="15" scale="2"/>
+        <sourceCurrency>
+          <attribute attributeName="CURRENCY"/>
+        </sourceCurrency>
+        <erpDecimalShift>true</erpDecimalShift>
+        <targetCurrency>
+          <localVariable>IP_O_TARGET_CURRENCY</localVariable>
+        </targetCurrency>
+        <referenceDate>
+          <attribute attributeName="DATE_SQL" dimensionUri="com.sap.training.analytics::date_dim"/>
+        </referenceDate>
+        <exchangeRateType>1001</exchangeRateType>
+      </currencyConversion>
+      <measureMapping columnObjectName="Projection_1" columnName="AMOUNT"/>
+      <exceptionAggregationMetadata/>
+    </measure>
+    <measure id="DISCOUNT" order="2" aggregationType="avg" measureType="simple">
+      <descriptions defaultDescription="DISCOUNT"/>
+      <measureMapping columnObjectName="Projection_1" columnName="DISCOUNT"/>
+      <exceptionAggregationMetadata/>
+    </measure>
+    <measure id="QUANTITY" order="4" aggregationType="sum" measureType="simple">
+      <descriptions defaultDescription="QUANTITY"/>
+      <measureMapping columnObjectName="Projection_1" columnName="QUANTITY"/>
+      <exceptionAggregationMetadata/>
+    </measure>
+  
+    <measure id="AMOUNT_ORIGINAL" order="5" aggregationType="sum" measureType="simple">
+      <descriptions defaultDescription="AMOUNT_ORIGINAL"/>
+  
+      <measureMapping columnObjectName="Projection_1" columnName="AMOUNT"/>
+      <exceptionAggregationMetadata/>
+    </measure>
+  </baseMeasures>
+  <calculatedMeasures/>
+  <restrictedMeasures/>
+  <localDimensions/>
+  <sharedDimensions>
+    <logicalJoin associatedObjectUri="com.sap.training.analytics::product_dim">
+      <attributes>
+        <attributeRef>PRODUCT_ID$local</attributeRef>
+      </attributes>
+      <associatedAttributeNames>
+        <attributeName>PRODUCT_ID</attributeName>
+      </associatedAttributeNames>
+      <properties cardinality="CN_1" joinType="referential" optimizeJoinColumns="true" joinOperator="Equal"/>
+      <associatedAttributeFeatures/>
+    </logicalJoin>
+    <logicalJoin associatedObjectUri="com.sap.training.analytics::customer_dim">
+      <attributes>
+        <attributeRef>CUSTOMER_ID$local</attributeRef>
+      </attributes>
+      <associatedAttributeNames>
+        <attributeName>CUSTOMER_ID</attributeName>
+      </associatedAttributeNames>
+      <properties cardinality="CN_1" joinType="referential" optimizeJoinColumns="true" joinOperator="Equal"/>
+      <associatedAttributeFeatures/>
+    </logicalJoin>
+    <logicalJoin associatedObjectUri="com.sap.training.analytics::date_dim">
+      <attributes>
+        <attributeRef>DATE_ID$local</attributeRef>
+      </attributes>
+      <associatedAttributeNames>
+        <attributeName>DATE_SQL</attributeName>
+      </associatedAttributeNames>
+      <properties cardinality="CN_1" joinType="referential" optimizeJoinColumns="true" joinOperator="Equal"/>
+      <associatedAttributeFeatures/>
+    </logicalJoin>
+  </sharedDimensions>
+</logicalModel>
+<layout>
+  <shapes>
+    <shape expanded="true" modelObjectName="Output" modelObjectNameSpace="MeasureGroup">
+      <upperLeftCorner x="40" y="85"/>
+    </shape>
+    <shape expanded="true" modelObjectName="Projection_1" modelObjectNameSpace="CalculationView">
+      <upperLeftCorner x="100" y="258"/>
+      <rectangleSize height="30" width="160"/>
+    </shape>
+    <shape modelObjectName="Projection_1" modelObjectNameSpace="StarJoinViewNodeInput" modelObjectType="repository">
+      <upperLeftCorner x="384" y="80"/>
+      <rectangleSize width="185"/>
+    </shape>
+    <shape modelObjectName="com.sap.training.analytics::product_dim" modelObjectNameSpace="StarJoinViewNodeSharedCV" modelObjectType="repository">
+      <upperLeftCorner x="634" y="16"/>
+      <rectangleSize width="295"/>
+    </shape>
+    <shape modelObjectName="com.sap.training.analytics::customer_dim" modelObjectNameSpace="StarJoinViewNodeSharedCV" modelObjectType="repository">
+      <upperLeftCorner x="16" y="80"/>
+      <rectangleSize width="304"/>
+    </shape>
+  
+    <shape modelObjectName="com.sap.training.analytics::date_dim" modelObjectNameSpace="StarJoinViewNodeSharedCV" modelObjectType="repository">
+      <upperLeftCorner x="634" y="226"/>
+      <rectangleSize width="275"/>
+    </shape>
+  </shapes>
+</layout>
+</Calculation:scenario>
