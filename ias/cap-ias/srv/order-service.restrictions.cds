@@ -7,6 +7,7 @@ annotate OrderService.Orders with @restrict: [
     },
     {
         grant: [
+            'READ',
             'CREATE',
             'UPDATE',
             'DELETE'
@@ -22,6 +23,7 @@ annotate OrderService.OrderItems with @restrict: [
     },
     {
         grant: [
+            'READ',
             'CREATE',
             'UPDATE',
             'DELETE'

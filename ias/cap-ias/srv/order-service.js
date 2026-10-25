@@ -22,7 +22,7 @@ module.exports = class OrderService extends cds.ApplicationService {
         this.before('CREATE', Orders, req => {
 
             req.data.status ??= 'OPEN';
-            req.data.currency ??= 'EUR';
+            req.data.currency_code ??= 'EUR';
 
             // totalAmount is derived data.
             req.data.totalAmount = 0;
