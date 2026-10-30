@@ -20,3 +20,8 @@ File or Folder | Purpose
 ## Learn More
 
 Learn more at <https://cap.cloud.sap>.
+
+https://help.sap.com/docs/btp/sap-business-technology-platform/set-up-your-application-for-multitenancy
+
+cf map-route project-management cfapps.us10-001.hana.ondemand.com \
+  --hostname consumer-yj2yhdnn-e954e80etrial-dev-project-management
