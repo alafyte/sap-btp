@@ -129,7 +129,7 @@ resources:
         xsappname: project-management-${org}-${space}
         appName: project-management-${org}-${space}
         displayName: project-management
-        description: A simple CAP project.
+        description: Project Manager SAP CAP application.
         category: 'Category'
         appUrls:
           getDependencies: ~{mtx-api/mtx-url}/-/cds/saas-provisioning/dependencies
