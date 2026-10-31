@@ -12,12 +12,12 @@
    - [Entitlements and quotas](./docs/sap-btp-cf-env.md#entitlements-and-quotas)
    - [Service Marketplace](./docs/sap-btp-cf-env.md#service-marketplace)
    - [SAP-specific Cloud Foundry configurations](./docs/sap-btp-cf-env.md#sap-specific-cloud-foundry-configurations)
-3. Setup and Tooling
-   - Installing and configuring CF CLI
-   - Logging in and targeting orgs/spaces
-   - CF CLI commands and plugins
-   - SAP BTP cockpit
-   - MultiApps CLI plugin
+3. [Setup and Tooling](./docs/setup_and_tooling.md)
+   - [Logging in and targeting orgs/spaces](./docs/setup_and_tooling.md#logging-in-and-targeting-orgsspaces)
+   - [CF CLI commands and plugins](./docs/setup_and_tooling.md#cf-cli-commands-and-plugins)
+   - [SAP BTP CLI](./docs/setup_and_tooling.md#sap-btp-cli)
+   - [MultiApps CLI plugin](./docs/setup_and_tooling.md#multiapps-cli-plugin)
+   - [Using `CF_HOME` to manage multiple environments](./docs/setup_and_tooling.md#using-cf_home-to-manage-multiple-environments)
 4. Deploy and Manage Node.js Applications
    - `cf push`
    - Application manifests
