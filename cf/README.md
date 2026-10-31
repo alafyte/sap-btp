@@ -6,12 +6,12 @@
    - [Staging and buildpacks](docs/cf-core-foundations.md#staging-and-buildpacks)
    - [Orgs, spaces, roles and permissions](docs/cf-core-foundations.md#orgs-spaces-roles-and-permissions)
    - [Networking and HTTP routing](docs/cf-core-foundations.md#networking-and-http-routing)
-2. SAP BTP Cloud Foundry Environment
-   - Global accounts, directories and subaccounts
-   - Cloud Foundry orgs and spaces
-   - Entitlements and quotas
-   - Service Marketplace
-   - SAP-specific Cloud Foundry configurations
+2. [SAP BTP Cloud Foundry Environment](./docs/sap-btp-cf-env.md)
+   - [Global accounts, directories and subaccounts](./docs/sap-btp-cf-env.md#global-accounts-directories-and-subaccounts)
+   - [Cloud Foundry orgs and spaces](./docs/sap-btp-cf-env.md#cloud-foundry-orgs-and-spaces)
+   - [Entitlements and quotas](./docs/sap-btp-cf-env.md#entitlements-and-quotas)
+   - [Service Marketplace](./docs/sap-btp-cf-env.md#service-marketplace)
+   - [SAP-specific Cloud Foundry configurations](./docs/sap-btp-cf-env.md#sap-specific-cloud-foundry-configurations)
 3. Setup and Tooling
    - Installing and configuring CF CLI
    - Logging in and targeting orgs/spaces
