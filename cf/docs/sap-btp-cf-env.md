@@ -250,3 +250,103 @@ Don't confuse these two resources:
 | Used during platform administration | Useful during architecture and technology selection |
 
 ## SAP-specific Cloud Foundry configurations
+
+### Is SAP BTP Cloud Foundry the same as open-source Cloud Foundry?
+Not exactly.
+
+SAP BTP provides a managed Cloud Foundry environmentbased on the open-source Cloud Foundry platform.
+
+SAP operates and maintains the underlying runtime infrastructure. Developers use familiar Cloud Foundry concepts and tools, but they don't administer the complete underlying platform themselves.
+
+Your responsibilities
+- Develop Node.js applications
+- Configure application resources
+- Deploy and monitor apps
+- Manage application-level security
+
+SAP's responsibilities
+- Operate the managed Cloud Foundry platform
+- Maintain the runtime infrastructure
+- Manage platform-level components
+- Provide platform updates and availability
+
+This is the Platform-as-a-Service model: you manage your applications, while SAP manages the platform infrastructure.
+
+### SAP-specific differences worth knowing
+
+There are several areas where SAP's managed environment differs from a self-managed Cloud Foundry installation.
+
+#### A. Managed infrastructure and platform operations
+
+In a self-managed Cloud Foundry foundation, an operator is responsible for platform installation, configuration, upgrades and infrastructure integrations.
+
+In SAP BTP, SAP takes care of these platform-level operations.
+
+As a developer, you normally interact through:
+- SAP BTP Cockpit.
+- Cloud Foundry CLI (cf).
+- SAP BTP CLI (btp), for account and environment administration.
+- APIs and supported developer tools.
+
+You generally don't manage Diego Cells, Gorouter configuration, BOSH deployments or platform-level service brokers directly.4
+
+#### B. Availability zones
+
+SAP BTP's Cloud Foundry environment uses availability zones in supported infrastructure regions.
+
+An availability zone is an isolated infrastructure location within a cloud region.
+
+The goal is to improve resilience by distributing platform workloads across infrastructure failure domains.
+
+#### C. Supported and unsupported Cloud Foundry features
+
+SAP BTP doesn't necessarily support every feature available in an arbitrary open-source Cloud Foundry deployment.
+
+The SAP documentation distinguishes supported and unsupported features. Some examples listed in its Cloud Foundry feature documentation include:
+
+| Feature	| SAP BTP consideration |
+| ------	| --------------------- |
+| Diego runtime	| Supported |
+| SSH into app containers	| Supported |
+| Custom domains	| Supported, subject to configuration |
+| TCP routing	| Not generally supported |
+| Container-to-container networking	| Not supported |
+| Isolation segments	| Not supported |
+| Docker-based app deployment	| Not supported in the documented feature set |
+| Running tasks	| Supported |
+
+The exact support status can depend on the feature and current SAP documentation. Always check before designing around a particular Cloud Foundry capability.
+
+#### D. SAP-managed domains and API endpoints
+
+Every SAP BTP Cloud Foundry environment has a regional API endpoint and application domains.
+
+For example, when connecting the CF CLI, you must use the API endpoint associated with the subaccount's region.
+
+```
+# Configure the regional API endpoint
+cf api https://api.cf.<region>.hana.ondemand.com
+
+# Log in
+cf login
+
+# Select your org and space
+cf target -o employee-dev-org -s development
+```
+
+The important distinction is that the Cloud Foundry foundation is region-specific. You cannot assume that an endpoint or application domain from another region will work.
+
+#### E. SAP integration and ecosystem
+
+SAP BTP's Cloud Foundry environment is integrated with SAP's broader service ecosystem.
+
+This is one of its biggest advantages compared with using an independent Cloud Foundry installation.
+
+You can build applications that use services such as:
+- SAP HANA Cloud for persistence.
+- XSUAA for authentication and authorization.
+- Destination service for remote-system configuration.
+- Connectivity service for access to on-premises systems.
+- SAP Event Mesh for asynchronous messaging.
+
+These services are not all part of the open-source Cloud Foundry runtime itself. They are SAP BTP capabilities that integrate with the environment.
