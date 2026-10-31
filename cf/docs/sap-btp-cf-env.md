@@ -202,4 +202,51 @@ Space quotas help prevent one space from consuming all the resources available t
 
 ## Service Marketplace
 
+The Service Marketplaceis the catalog of services available for consumption in SAP BTP.
+
+For example:
+- Database and persistent storage.
+- Authentication and authorization.
+- Messaging.
+- Application monitoring.
+- Connectivity to external systems.
+- Document management.
+
+SAP and its partners provide these capabilities as platform services.
+
+The Service Marketplace is where you discover the available offerings and their plans.
+
+### Service offerings and service plans
+
+Two terms are particularly important:
+- Service offering: the service itself, such as SAP HANA Cloud.
+- Service plan: a particular variant of that service, defining capabilities, configuration, capacity or commercial characteristics.
+
+For example, a database offering might provide different plans for different use cases or resource sizes.
+
+The actual plans and their names are service-specific. Don't assume that all services offer the same types of plans.
+
+###  Who controls what appears in the Marketplace?
+
+Not every SAP BTP service is automatically available to every subaccount.
+
+The availability depends on factors such as:
+- Your global account's entitlements.
+- Which entitlements have been assigned to your subaccount.
+- The service's availability in your selected region.
+- The environment in which the service can be consumed.
+
+For example, a service may be available for Cloud Foundry but not for Kyma, or vice versa.
+
+This is why two developers working for the same company can see different services in their respective subaccounts.
+
+### Marketplace vs. SAP Discovery Center
+
+Don't confuse these two resources:
+| Service Marketplace	| SAP Discovery Center |
+| ------------------ | ---------------------- |
+| Used to discover and consume available services in your account | Used to explore SAP services, capabilities and solution scenarios |
+| Shows offerings and plans available to your subaccount | Provides broader service information and learning material |
+| Used during platform administration | Useful during architecture and technology selection |
+
 ## SAP-specific Cloud Foundry configurations
