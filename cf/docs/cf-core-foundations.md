@@ -574,4 +574,114 @@ Official reading: [Managing roles in Cloud Foundry](https://docs.cloudfoundry.or
 
 ## Networking and HTTP routing
 
+The main component is the Gorouter.
 
+It receives incoming HTTP requests and forwards them to the appropriate application instance. The routing tier maintains information about which application instances are available and where they are running.
+
+Official reading: [HTTP routing](https://docs.cloudfoundry.org/concepts/http-routing.html).
+
+![http_routing](./images/http_routing.png)
+
+- **Diego** decides where application instances run.
+- **Gorouter** decides where incoming HTTP requests go.
+- **Route Emitter** publishes information about running instances so the routing tier can keep its routing table updated.
+
+Official reading: [Cloud Foundry routing architecture](https://docs.cloudfoundry.org/concepts/cf-routing-architecture.html).
+
+### What is a route?
+A route is an address through which a client can reach an application.
+
+For example:
+```
+employee-api.example.com
+```
+A route can also include a path:
+```
+employee-api.example.com/employees
+```
+
+Cloud Foundry associates routes with applications. This association is called route mapping.
+
+You can inspect and manage routes using:
+```
+# List routes
+cf routes
+
+# Map a route to an application
+cf map-route employee-api example.com \
+  --hostname employee-api
+
+# Remove a route mapping
+cf unmap-route employee-api example.com \
+  --hostname employee-api
+```
+
+The exact domain must be available to the org, and the route must be valid in the target environment.
+
+The routing tier updates its information as application instances start, stop, or move.
+
+Official reading: [Configuring routes and domains](https://docs.cloudfoundry.org/devguide/deploy-apps/routes-domains.html).
+
+### What happens when a request arrives?
+
+Let's follow a request:
+```
+GET https://employee-api.example.com/employees
+```
+
+1. The browser resolves the hostname and connects to the platform's external endpoint.
+2. The load balancer forwards the request into the Cloud Foundry routing tier, depending on the deployment configuration.
+3. Gorouter examines the host and path.
+4. It matches the request to a registered route.
+5. It selects an available application instance.
+6. The request reaches the Node.js application.
+7. The application processes the request and returns an HTTP response.
+
+### Load balancing across instances
+
+Suppose you deploy three instances:
+```
+cf scale employee-api -i 3
+```
+
+The same route can direct traffic to all three instances.
+
+Cloud Foundry's Gorouter uses round-robin balancing by default in the documented configuration, although least-connection balancing is also supported.
+
+Node.js implication: don't assume that two consecutive requests from the same user will reach the same Node.js process.
+Avoid storing important session state only in memory:
+```
+// Risky when multiple instances are running
+const sessions = new Map();
+```
+
+Instead, use a shared persistence mechanism such as Redis or a database when session state must be shared between instances.
+
+### HTTP vs. HTTPS and forwarded headers
+
+Production applications should normally be accessed over HTTPS.
+
+TLS termination can happen at the load balancer, Gorouter, or both, depending on how the Cloud Foundry foundation is configured.
+
+One header you'll encounter when working behind proxies is:
+```
+X-Forwarded-Proto: https
+```
+It tells your application which protocol the original client used.
+
+Another is:
+```
+X-Forwarded-For: 203.0.113.10
+```
+
+It carries information about the originating client IP address through proxy layers.
+
+These headers matter for:
+- Secure cookie configuration.
+- Redirecting HTTP traffic to HTTPS.
+- Generating correct absolute URLs.
+- Logging client IP information.
+
+Only trust forwarded headers when they are supplied by infrastructure you trust. A client can otherwise send forged header values.
+
+Official reading: [Securing incoming traffic in Cloud Foundry](https://docs.cloudfoundry.org/adminguide/securing-traffic.html).
