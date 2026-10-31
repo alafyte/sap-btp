@@ -498,6 +498,80 @@ Official reading: [Starting, restarting, and restaging your apps](https://docs.c
 
 ## Orgs, spaces, roles and permissions
 
+### The hierarchy
+
+A Cloud Foundry installation is called a foundation. Inside it, resources are organized into organizations (orgs) and spaces.
+
+![cf_foundation](./images/cf_foundation.png)
+
+- Foundation: the overall platform installation.
+- Org: groups users, spaces, quotas, service availability and custom domains.
+- Space: a working area for deploying and managing applications, services and routes.
+
+An org can contain multiple spaces. Apps, services and routes belong to a specific space.
+
+Official reading: [Orgs, spaces, roles, and permissions in Cloud Foundry](https://docs.cloudfoundry.org/concepts/roles.html), [Planning orgs and spaces in Cloud Foundry](https://docs.cloudfoundry.org/concepts/orgs-and-spaces.html).
+
+### Roles and permissions
+Cloud Foundry uses role-based access control (RBAC). A role determines what a user can do and at which level.
+The roles you'll most often encounter are:
+
+| Role | Main responsibility |
+| ---- | ------------------- |
+| Org Manager | Administers an org and manages its spaces and org-level roles |
+| Org Auditor | Read-only org-level visibility |
+| Space Manager | Manages a space and its roles |
+| Space Developer | Deploys and manages apps and services |
+| Space Auditor | Read-only access to a space |
+| Space Supporter | Troubleshoots apps and service bindings |
+
+There are also platform-level roles, such as Admin and Global Auditor.
+A subtle but important detail: Org Manager does not automatically mean Space Developer. Org-level and space-level permissions are separate. A person needs the appropriate space role to deploy applications there.
+
+Official reading: [User role permissions](https://docs.cloudfoundry.org/concepts/roles.html#permissions).
+
+### Working with orgs and spaces using the CLI
+
+These are commands worth knowing:
+
+```
+# Log in
+cf login
+
+# List available orgs
+cf orgs
+
+# List spaces in an org
+cf spaces
+
+# Show current target
+cf target
+
+# Target a specific org and space
+cf target -o acme-company -s development
+
+# List applications in the current space
+cf apps
+```
+To inspect users and roles:
+```
+cf org-users acme-company
+
+cf space-users acme-company development
+```
+
+To assign a Space Developer role (assuming you have sufficient privileges):
+```
+cf set-space-role \
+  developer@example.com \
+  acme-company \
+  development \
+  SpaceDeveloper
+```
+The user must first have an org role in the parent org before receiving a space role.
+
+Official reading: [Managing roles in Cloud Foundry](https://docs.cloudfoundry.org/concepts/managing-roles.html).
+
 ## Networking and HTTP routing
 
 
