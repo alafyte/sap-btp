@@ -30,6 +30,7 @@
 5. Services and Service Bindings
    - Service Marketplace
    - Service instances
+   - Service keys
    - Service bindings
    - `VCAP_SERVICES`
    - User-provided services

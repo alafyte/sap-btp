@@ -389,7 +389,112 @@ The diagram is a conceptual view. Some communication paths are simplified, and t
 
 ![runtime_view](./images/runtime_view.png)
 
+Official reading: [Diego components and architecture](https://docs.cloudfoundry.org/concepts/diego/diego-architecture.html).
+
 ## Staging and buildpacks
+
+Cloud Foundry doesn't simply copy the source code into a container and run it. It first prepares the application using a buildpack. That preparation process is called staging.
+
+### The three phases of cf push
+
+![cf_push_stages](./images/cf_push_stages.png)
+
+Diego places the application on a Cell, creates its container, and starts the process using the droplet.
+These phases help you identify where a deployment problem occurs: upload, staging, or startup.
+
+Official reading: [Staging your apps in Cloud Foundry](https://docs.cloudfoundry.org/concepts/how-applications-are-staged.html).
+
+### What is a buildpack?
+
+A buildpack is a set of scripts and dependencies that prepares your application to run on Cloud Foundry.
+
+For a Node.js application, the Node.js buildpack typically:
+- Detects that the project is a Node.js application.
+- Selects a compatible Node.js runtime.
+- Installs or prepares application dependencies.
+- Determines how the application should start.
+- Produces the staged application artifact.
+
+Cloud Foundry's Node.js buildpack normally detects a Node.js project when it finds a package.json in the project root.
+
+The `engines.node` field expresses the Node.js version your application requires. Make sure the selected version is supported by the buildpack installed in your target Cloud Foundry environment.
+
+Official reading: [Node.js buildpack](https://docs.cloudfoundry.org/buildpacks/node/).
+
+### What is a droplet?
+
+A droplet is the packaged, executable result of staging.
+
+Think of the distinction this way:
+| Item | Meaning | Source code |
+| ---- | ------- | ----------- |
+| Your original project files | Buildpack | Prepares the project to run |
+| Staging | The preparation process | Droplet |
+| The resulting runnable artifact | Container | The environment where the droplet runs |
+
+The droplet contains your application and the runtime/dependencies prepared during staging. Diego can then use that droplet to start application instances on Cells.
+
+### How does Cloud Foundry know how to start Node.js?
+
+The package.json defines a start script:
+
+```json
+{
+  "scripts": {
+    "start": "node server.js"
+  }
+}
+```
+
+The Node.js buildpack can use this to determine the default web process command.
+
+There is one important Cloud Foundry requirement: your web server must listen on the port provided through the PORT environment variable.
+
+For example, with Express:
+
+```js
+const express = require("express");
+
+const app = express();
+
+const port = process.env.PORT || 3000;
+
+app.get("/", (req, res) => {
+  res.send("Hello from Cloud Foundry!");
+});
+
+app.listen(port, () => {
+  console.log(`Server listening on ${port}`);
+});
+```
+
+Why `process.env.PORT`?
+
+Cloud Foundry controls the port allocated to your application. Hardcoding a port such as 3000 can prevent the platform's routing from reaching the app correctly.
+
+### Staging vs. running: an important distinction
+
+These are separate operations:
+- Staging: prepares a new droplet from your source code and buildpack.
+- Running: starts an application process using an existing droplet.
+
+This distinction explains two useful commands:
+
+```
+cf restart employee-api
+```
+
+Restarts the application using its existing droplet.
+
+```
+cf restage employee-api
+```
+
+Runs staging again to create a new droplet, then starts the application.
+
+For example, if you change an environment variable that the buildpack uses during staging, you may need cf restage, not just cf restart.
+
+Official reading: [Starting, restarting, and restaging your apps](https://docs.cloudfoundry.org/devguide/deploy-apps/start-restart-restage.html).
 
 ## Orgs, spaces, roles and permissions
 
