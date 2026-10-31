@@ -49,9 +49,6 @@
    - `@sap/approuter`
    - `xs-app.json`
    - Authentication through App Router
-   - Destination service
-   - Connectivity service
-   - Cloud Connector
 8. MTA Deployment
    - MTA concepts and architecture
    - `mta.yaml`
