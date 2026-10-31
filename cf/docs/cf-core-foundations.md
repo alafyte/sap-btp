@@ -39,9 +39,7 @@ flowchart TD
 
 > **Note:** This is a simplified conceptual diagram, not a complete representation of Cloud Foundry's internal architecture. In SAP BTP, some infrastructure components are managed by SAP and may not be directly visible to application developers.
 
-
-### Main Components
-#### 1. Cloud Controller – the manager
+### 1. Cloud Controller – the manager
 
 Think of Cloud Controller as the central management API of Cloud Foundry.
 
@@ -69,7 +67,7 @@ Cloud Controller processes the request to change the desired number of applicati
 
 Official reading: [Cloud Controller](https://docs.cloudfoundry.org/concepts/architecture/cloud-controller.html).
 
-#### 2. Diego – the application runtime manager
+### 2. Diego – the application runtime manager
 
 Diego is responsible for scheduling and managing application instances.
 
@@ -98,7 +96,7 @@ This is called self-healing behavior.
 
 Official reading: [Diego components and architecture](https://docs.cloudfoundry.org/concepts/diego/diego-architecture.html).
 
-#### 3. Diego Cells – where the application runs
+### 3. Diego Cells – where the application runs
 
 A Diego Cell is a virtual machine that hosts application containers.
 
@@ -113,7 +111,7 @@ You don't normally need to manage these VMs yourself when using SAP BTP's manage
 
 > Remember: Diego is the system responsible for scheduling and managing; Diego Cells provide the execution environment.
 
-#### 4. Gorouter – the traffic manager
+### 4. Gorouter – the traffic manager
 
 Imagine the application is accessible through:
 
@@ -137,7 +135,7 @@ For example:
 
 Official reading: [Routing Architecture](https://docs.cloudfoundry.org/concepts/cf-routing-architecture.html).
 
-#### 5. Buildpacks – preparing the application
+### 5. Buildpacks – preparing the application
 
 The Node.js application needs a suitable runtime environment.
 
@@ -154,7 +152,7 @@ The simple relationship:
 - Buildpack = prepares the application.
 - Droplet = the staged application artifact ready to run.
 
-#### 6. Loggregator – collecting logs and metrics
+### 6. Loggregator – collecting logs and metrics
 
 When your Node.js application runs, it produces logs:
 
@@ -172,9 +170,224 @@ A developer can access application logs using:
 cf logs my-node-app
 ```
 
-## Runtime components
-
 ## Diego architecture and scheduling
+
+For learning purposes, divide Diego into four main areas:
+1. Diego Brain – scheduling decisions.
+2. BBS – keeping track of desired and actual state.
+3. Diego Cells – executing application processes.
+4. Auctioneer – deciding which Cell should run a process.
+
+### 1. Diego Brain – the scheduler
+
+Its main responsibility is to coordinate work across the Diego Cells.
+It contains components such as:
+- Auctioneer – distributes work across Cells.
+- BBS – maintains information about application processes and their state.
+
+It coordinates the runtime rather than executing the Node.js application.
+
+### 2. BBS – Bulletin Board System
+
+Imagine Cloud Foundry needs to maintain three instances of your application.
+
+BBS maintains information about:
+- How many instances should be running.
+- How many instances are actually running.
+- Which instances are currently being started or stopped.
+- Which tasks need to be executed.
+
+This brings us to two important terms:
+- DesiredLRP: The expected state of a long-running process
+- ActualLRP: The current state of a long-running process
+
+> LRP stands for Long-Running Process.
+
+For example:
+
+![bbs_example](./images/bbs_example.png)
+
+The process of comparing desired and actual state and correcting differences is called convergence. This is a central concept in Cloud Foundry.
+
+For example:
+- Desired = 3, Actual = 2 → start another instance.
+- Desired = 3, Actual = 4 → stop the extra instance.
+- Desired = 3, Actual = 3 → no correction needed.
+
+**One important detail:** BBS doesn't itself execute the Node.js process. It tracks state and coordinates the work required to achieve the desired state.
+
+### 3. Auctioneer – choosing where to run applications
+Now imagine you have five Diego Cells:
+| Diego Cell | Available memory |
+|----------- | ---------------- |
+| Cell A | 1 GB |
+| Cell B | 2 GB |
+| Cell C | 512 MB |
+| Cell D | 3 GB |
+| Cell E | 1.5 GB |
+
+You want to start a Node.js application that requires 512 MB of allocated memory.
+
+**Which Cell should run it?**
+
+Diego uses an auction mechanism.
+
+The Auctioneer asks the available Cells to indicate whether they can accommodate the workload.
+
+Each Cell's Rep evaluates whether it has enough available resources.
+
+The Auctioneer then selects an appropriate Cell.
+
+The selection considers factors such as:
+- Available resources.
+- Existing workload.
+- Distribution of application instances.
+- Availability zones.
+
+This is not necessarily a simple "choose the Cell with the most memory" algorithm.
+The goal is to distribute workloads appropriately across the available infrastructure.
+
+Simplified auction example:
+
+![auction_example](./images/auction_example.png)
+
+The important thing is that the Auctioneer doesn't create the container itself. It coordinates placement.
+
+Official reading: [How Diego balances app processes](https://docs.cloudfoundry.org/concepts/diego/diego-auction.html).
+
+### 4. Diego Cells – executing the application
+
+A Diego Cell is a virtual machine hosting the components responsible for executing application workloads.
+
+The most important internal components to know are:
+| Component | Responsibility |
+|---------- | -------------- |
+| Rep | Represents the Cell in Diego and manages workloads assigned to it |
+| Executor | Executes the actions needed to run application processes |
+| Garden | Provides and manages containers |
+| Metron Agent | Forwards logs and metrics |
+
+Let's see how they work together.
+Suppose the Auctioneer selects Cell C.
+1. The Rep on Cell C accepts the assigned workload.
+2. The Rep coordinates with the Executor.
+3. The Executor uses Garden to create a container.
+4. The application droplet is made available inside the container.
+5. The Node.js start command is executed.
+6. The application starts running.
+
+![inside_diego_cell](./images/inside_cell.png)
+
+### Important distinction: LRP vs. Task
+
+#### LRP – Long-Running Process
+A process that is expected to run continuously.
+Examples:
+- Node.js REST API.
+- Express server.
+- Background worker.
+- Application server.
+
+The deployed Node.js API is typically an LRP.
+
+#### Task
+A process that runs to completion.
+Examples:
+- Database migration.
+- One-time data import.
+- Background calculation.
+- Scheduled batch operation.
+
+Here's the difference:
+| Characteristic | LRP | Task |
+| -------------- | --- | ---- |
+| Execution | Continuous | Finite |
+| Expected to stay running | Yes | No |
+| Has desired instance count | Yes | No continuous replica count |
+| Example | REST API | Data migration |
+
+A useful real-world example:
+
+Imagine the Node.js application needs to import 100,000 employee records.
+
+There could be:
+- An LRP running your REST API.
+- A Task executing the one-time import.
+
+Both are workloads that Diego can schedule and execute.
+
+###  What happens when the Node.js application crashes?
+
+There's a deployed Node.js API with three instances.
+```
+cf scale employee-api -i 3
+```
+
+Everything works correctly.
+
+Then, suddenly, one of the Node.js processes crashes.
+
+For example, the application encounters an unhandled exception.
+
+```
+throw new Error("Unexpected application failure");
+```
+
+What happens next?
+
+#### Application crash and recovery
+
+1. Application crashes → One Node.js process terminates inside its container.
+2. Rep detects the change → The Rep on the Diego Cell detects that the container/process is no longer running as expected.
+3. BBS receives updated state → The actual state is updated, and the discrepancy with the desired state becomes visible.
+4. Convergence detects the difference → Desired instances = 3. Actual instances = 2.
+5. Auctioneer coordinates replacement placement → A suitable Diego Cell is selected for the missing instance.
+6. New container starts → The new application process is started.
+7. Desired state is restored → Your application is back to three running instances.
+
+This is one of the most valuable features of Cloud Foundry.
+
+You specify how many instances you want, and the platform works to maintain that desired state.
+
+However, remember something important:
+
+**Self-healing doesn't mean your application code is fixed.**
+
+If your application has a bug that causes every new instance to crash, Cloud Foundry may keep trying to restore instances, but the underlying bug remains.
+
+That's why application logs and troubleshooting are still important.
+
+### How does Gorouter fit into this architecture?
+
+Diego starts and manages application instances, but users still need to access those instances.
+
+That's where Gorouter comes in.
+
+When an instance starts, the route-emitter component on the Diego Cell communicates routing information to Gorouter.4
+
+For example:
+```
+https://employee-api.cfapps.eu10.hana.ondemand.com
+```
+
+Imagine three instances are running:
+- Instance 1 on Cell A.
+- Instance 2 on Cell C.
+- Instance 3 on Cell D.
+
+Gorouter uses routing information to direct incoming requests to available instances.
+
+![gorouter_calls](./images/gorouter_cells.png)
+
+Notice the distinction:
+- Diego manages where applications run.
+- Gorouter manages how HTTP traffic reaches them.
+
+### Conceptual View
+
+The diagram is a conceptual view. Some communication paths are simplified, and the components are distributed across different platform VMs.
+
+![runtime_view](./images/runtime_view.png)
 
 ## Staging and buildpacks
 
