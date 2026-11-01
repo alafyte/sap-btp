@@ -140,6 +140,80 @@ cf delete-service user-db
 Be careful with deletion: removing a service instance can result in loss of its associated data, depending on the service provider and its behavior.
 
 ## Service keys
+
+### What is a service key?
+
+A service key is a set of credentials generated for a service instance.
+
+For example, imagine you have created a PostgreSQL service instance called `user-db`.
+
+The service provider may generate credentials containing:
+
+```
+{
+  "hostname": "postgres.example.com",
+  "port": 5432,
+  "database": "userdb",
+  "username": "db_user",
+  "password": "generated-secret",
+  "ssl": true
+}
+```
+
+These credentials allow a client to connect to the database.
+
+The exact structure depends on the service provider.
+
+Important: Creating a service key does not create another database. It creates credentials for accessing an existing service instance.
+
+### Creating a service key
+
+Cloud Foundry provides this command:
+
+```
+cf create-service-key SERVICE_INSTANCE SERVICE_KEY_NAME
+```
+
+For example:
+
+```
+cf create-service-key user-db user-db-key
+```
+
+This creates a service key called `user-db-key` for the existing `user-db` instance.
+
+To inspect it:
+
+```
+cf service-key user-db user-db-key
+```
+
+To list the keys:
+
+```
+cf service-keys user-db
+```
+
+To delete a key:
+
+```
+cf delete-service-key user-db user-db-key
+```
+
+### Important security considerations
+
+Service keys contain sensitive credentials.
+
+Follow these practices:
+
+- Never commit service-key credentials to Git.
+- Never hardcode database passwords in your NestJS source code.
+- Restrict access to service keys.
+- Delete keys that are no longer required.
+- Rotate credentials when necessary, according to the service provider's supported procedures.
+
+Also, a service key does not automatically make a database accessible over the internet. Network access, IP restrictions, and other provider-specific requirements still apply.
+
 ## Service bindings
 ## `VCAP_SERVICES`
 ## User-provided services
