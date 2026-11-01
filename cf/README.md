@@ -57,6 +57,7 @@
    - MTAR archives
    - `cf deploy`
    - Deployment and troubleshooting
+   - Blue-green deployments
 9. Production Operations
    - Application monitoring
    - Logging and troubleshooting

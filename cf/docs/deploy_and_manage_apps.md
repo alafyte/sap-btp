@@ -688,5 +688,3 @@ Consider this scenario:
 This is part of Cloud Foundry's application recovery and convergence behavior.
 
 Health checks help Cloud Foundry determine whether instances are ready or healthy; Diego manages the actual application instances and their lifecycle.
-
-## Blue-green deployments
