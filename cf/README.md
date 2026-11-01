@@ -26,16 +26,14 @@
    - [Memory and instance scaling](./docs/deploy_and_manage_apps.md#memory-and-instance-scaling)
    - [Logs and troubleshooting](./docs/deploy_and_manage_apps.md#logs-and-troubleshooting)
    - [Health checks](./docs/deploy_and_manage_apps.md#health-checks)
-   - [Blue-green deployments](./docs/deploy_and_manage_apps.md#blue-green-deployments)
-5. Services and Service Bindings
-   - Service Marketplace
-   - Service instances
-   - Service keys
-   - Service bindings
-   - `VCAP_SERVICES`
-   - User-provided services
-   - Open Service Broker API
-   - CredHub (conceptual)
+5. [Services](./docs/services.md)
+   - [Service instances](./docs/services.md#service-instances)
+   - [Service keys](./docs/services.md#service-keys)
+   - [Service bindings](./docs/services.md#service-bindings)
+   - [`VCAP_SERVICES`](./docs/services.md#vcap_services)
+   - [User-provided services](./docs/services.md#user-provided-services)
+   - [Open Service Broker API](./docs/services.md#open-service-broker-api)
+   - [CredHub (conceptual)](./docs/services.md#credhub-conceptual)
 6. SAP BTP Authentication and Authorization
    - OAuth 2.0
    - XSUAA
