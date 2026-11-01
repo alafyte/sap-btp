@@ -494,6 +494,33 @@ will automatically run your NestJS build command and package exactly the files y
 For the full command reference, see the [MBT usage documentation](https://sap.github.io/cloud-mta-build-tool/usage).
 
 ## MTAR archives
+
+The `mtar` archive contains the compiled NestJS application and the MTA deployment metadata.
+
+## Understanding the archive
+
+user-management_1.0.0.mtar
+
+```
+├───META-INF
+│       MANIFEST.MF
+│       mtad.yaml
+│
+└───user-management
+    │   data.zip
+```
+
+### `META-INF/`
+
+- `MANIFEST.MF`: archive-level metadata.
+- `mtad.yaml`: deployment descriptor generated for the MTA. It describes the modules and resources that the deployment process needs to coordinate.
+
+### `user-management/data.zip`
+
+This is the important part for the application. It contains the module's packaged content.
+
+The `dist/` folder contains compiled JavaScript. That is the compiled application MBT produced from the NestJS TypeScript source.
+
 ## `cf deploy`
 ## Deployment and troubleshooting
 ## Blue-green deployments
