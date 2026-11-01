@@ -870,3 +870,88 @@ Remember the distinction:
 - Service provider infrastructure supplies the actual database or other service.
 
 ## CredHub (conceptual)
+
+## What is CredHub?
+
+CredHub is a credential management component in the Cloud Foundry ecosystem.
+
+It provides secure storage and management of sensitive information, such as:
+
+- Database usernames and passwords.
+- API keys.
+- Certificates and private keys.
+- Other application secrets.
+
+Instead of scattering sensitive credentials across configuration files, applications and deployment scripts, credentials can be managed centrally.
+
+## Why is it needed?
+
+Imagine your NestJS application connects to PostgreSQL.
+
+Your database credentials might look like this:
+
+```
+{
+  "hostname": "postgres.example.com",
+  "username": "app_user",
+  "password": "super-secret-password"
+}
+```
+
+You should never put these credentials directly into:
+
+- Git repositories.
+- `manifest.yml`.
+- Application source code.
+- Public logs.
+- Docker images or deployment artifacts.
+
+A credential management system provides a safer way to manage sensitive information.
+
+## How CredHub fits into Cloud Foundry
+
+At a conceptual level:
+
+![credhub](./images/credhub.png)
+
+One important clarification: CredHub is not itself the PostgreSQL service broker, and the application doesn't normally connect directly to CredHub to retrieve its database credentials. Cloud Foundry and the platform's service-management components handle the relevant integration.
+
+The exact integration depends on the Cloud Foundry deployment and platform configuration.
+
+## CredHub vs VCAP_SERVICES
+
+These two concepts serve different purposes.
+
+| CredHub                               | VCAP_SERVICES                                     |
+| ------------------------------------- | ------------------------------------------------- |
+| Credential management component       | Environment variable provided to the application  |
+| Stores and manages credentials        | Exposes bound service information and credentials |
+| Platform-level capability             | Application runtime configuration                 |
+| Can manage different types of secrets | Contains service binding data                     |
+
+Think of it this way:
+
+- CredHub concerns secure credential management.
+- `VCAP_SERVICES` is how your application receives its bound service information.
+
+## What does this mean for the application?
+
+For current sample implementation:
+
+```js
+const vcapServices = JSON.parse(
+  process.env.VCAP_SERVICES ?? '{}',
+);
+```
+
+is still the normal application-level approach for reading bound service credentials.
+
+You generally don't need to add a CredHub client to your NestJS project just because you're using a PostgreSQL service binding.
+
+Your responsibilities remain:
+
+1. Read credentials from the binding.
+2. Avoid logging sensitive information.
+3. Never commit credentials to Git.
+4. Use secure connections where required.
+5. Follow your platform's credential rotation and access policies.
