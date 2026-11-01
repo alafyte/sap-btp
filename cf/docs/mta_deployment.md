@@ -522,5 +522,40 @@ This is the important part for the application. It contains the module's package
 The `dist/` folder contains compiled JavaScript. That is the compiled application MBT produced from the NestJS TypeScript source.
 
 ## `cf deploy`
+
+The command comes from the MultiApps CLI plugin, not the standard Cloud Foundry CLI functionality.
+
+When you run:
+
+```
+cf deploy mta_archives/user-management_1.0.0.mtar
+```
+
+the process is approximately:
+
+1. The CLI uploads your MTAR to the MultiApps Controller.
+2. The Controller reads `mtad.yaml`.
+3. It determines which modules and resources need to be deployed or updated.
+4. It checks resource dependencies.
+5. It creates or updates the required service instances and application modules according to the descriptor.
+6. It binds services to applications.
+7. It uploads application content.
+8. It starts or restarts applications as needed.
+9. It reports whether the deployment succeeded.
+
+The important part is that the Controller coordinates the deployment as one MTA operation, rather than you manually performing every `cf push`, service binding, and update yourself.
+
+### `cf deploy` versus `cf push`
+
+| Feature             | `cf push`                    | `cf deploy`                       |
+| ------------------- | ---------------------------- | --------------------------------- |
+| Deploys             | Individual CF app            | Complete MTA                      |
+| Reads               | `manifest.yml` (if provided) | `mtad.yaml` inside MTAR           |
+| Service resources   | Usually managed separately   | Coordinated through MTA resources |
+| Module dependencies | Not modelled                 | Modelled in MTA                   |
+| Deployment tracking | CF app operations            | MTA operations                    |
+| Main tool           | CF CLI                       | MultiApps CLI plugin              |
+
+
 ## Deployment and troubleshooting
 ## Blue-green deployments
