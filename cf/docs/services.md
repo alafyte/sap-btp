@@ -530,6 +530,8 @@ if (!postgresService) {
 const credentials = postgresService.credentials;
 ```
 
+See full code reference [here](../nestjs-cf/src/config.ts).
+
 ### VCAP_SERVICES vs. VCAP_APPLICATION
 
 You have already seen both variables in your actual CF environment output.
@@ -601,5 +603,110 @@ Avoid:
 - Sharing unredacted output when troubleshooting.
 
 ## User-provided services
+
+## What is a user-provided service?
+
+A user-provided service is a service instance whose connection information you provide manually through the Cloud Foundry CLI.
+
+Unlike a marketplace service:
+- Cloud Foundry doesn't provision the underlying database.
+- There is no service broker managing its lifecycle.
+- You provide the credentials and connection information yourself.
+- You can still bind the service to your application.
+
+For example, imagine you have an external PostgreSQL database:
+
+```
+Host: postgres.example.com
+Port: 5432
+Database: users
+Username: app_user
+Password: ********
+```
+
+You can represent this database as a user-provided service in Cloud Foundry.
+
+## Creating a user-provided service
+
+Use:
+
+```
+cf create-user-provided-service SERVICE_NAME -p "credentials"
+```
+
+For example:
+
+```
+cf create-user-provided-service external-postgres -p '{"hostname":"postgres.example.com","port":5432,"dbname":"users","username":"app_user","password":"secret"}'
+```
+
+Here:
+
+| Property            | Meaning                         |
+| ------------------- | ------------------------------- |
+| `external-postgres` | Name of the CF service instance |
+| `-p`                | Supplies credentials as JSON    |
+| `hostname`          | Database hostname               |
+| `port`              | Database port                   |
+| `dbname`            | Database name                   |
+| `username`          | Database username               |
+| `password`          | Database password               |
+
+The values are illustrative.
+
+You can inspect it with:
+
+```
+cf services
+cf service external-postgres
+```
+
+## Binding it to your application
+
+The binding process is familiar:
+
+```
+cf bind-service user-management external-postgres
+cf restart user-management
+```
+
+After binding, Cloud Foundry makes the supplied credentials available through `VCAP_SERVICES`.
+
+Your application can access them using the same general approach as before:
+
+```
+const vcapServices = JSON.parse(
+  process.env.VCAP_SERVICES ?? '{}',
+);
+```
+
+Important: The service label and credential structure for a user-provided service differ from those of a marketplace service. Don't assume the key will be `postgresql-db`.
+
+## Marketplace service vs user-provided service
+
+| Feature                     | Marketplace service      | User-provided service |
+| --------------------------- | ------------------------ | --------------------- |
+| Created through             | Service broker           | CF CLI                |
+| Infrastructure provisioned  | Usually yes, by provider | No                    |
+| Credentials supplied by     | Broker                   | You                   |
+| Lifecycle managed by broker | Yes                      | No                    |
+| Can be bound to apps        | Yes                      | Yes                   |
+| Appears in `VCAP_SERVICES`  | Yes                      | Yes                   |
+
+One key distinction: a user-provided service is only a representation of connection information. Creating it does not create a PostgreSQL database or guarantee that your application can reach the external database.
+
+You still need valid credentials, network connectivity, firewall access, and any required TLS configuration.
+
+## When would you use it?
+
+Typical scenarios include:
+
+- Connecting to an existing database hosted outside SAP BTP.
+- Connecting to an internal company API.
+- Providing credentials for an external service that doesn't have a suitable marketplace broker.
+- Representing connection details for a legacy system.
+
+Be careful with credentials: avoid putting real passwords directly into shell history, scripts, or source control. Restrict access to the service instance and rotate credentials when necessary.
+
 ## Open Service Broker API
 ## CredHub (conceptual)
