@@ -604,7 +604,7 @@ Avoid:
 
 ## User-provided services
 
-## What is a user-provided service?
+### What is a user-provided service?
 
 A user-provided service is a service instance whose connection information you provide manually through the Cloud Foundry CLI.
 
@@ -626,7 +626,7 @@ Password: ********
 
 You can represent this database as a user-provided service in Cloud Foundry.
 
-## Creating a user-provided service
+### Creating a user-provided service
 
 Use:
 
@@ -661,7 +661,7 @@ cf services
 cf service external-postgres
 ```
 
-## Binding it to your application
+### Binding it to your application
 
 The binding process is familiar:
 
@@ -682,7 +682,7 @@ const vcapServices = JSON.parse(
 
 Important: The service label and credential structure for a user-provided service differ from those of a marketplace service. Don't assume the key will be `postgresql-db`.
 
-## Marketplace service vs user-provided service
+### Marketplace service vs user-provided service
 
 | Feature                     | Marketplace service      | User-provided service |
 | --------------------------- | ------------------------ | --------------------- |
@@ -697,7 +697,7 @@ One key distinction: a user-provided service is only a representation of connect
 
 You still need valid credentials, network connectivity, firewall access, and any required TLS configuration.
 
-## When would you use it?
+### When would you use it?
 
 Typical scenarios include:
 
@@ -709,4 +709,164 @@ Typical scenarios include:
 Be careful with credentials: avoid putting real passwords directly into shell history, scripts, or source control. Restrict access to the service instance and rotate credentials when necessary.
 
 ## Open Service Broker API
+
+### The problem OSBAPI solves
+
+Imagine SAP BTP offers PostgreSQL through a service marketplace.
+
+When you execute:
+
+```
+cf create-service postgresql development postgres-db
+```
+
+Cloud Foundry needs to communicate with the PostgreSQL service provider and ask it to provision a database.
+
+But how does Cloud Foundry know how to communicate with that provider?
+
+The answer is a standardized API: Open Service Broker API.
+
+It defines how a platform communicates with service brokers.
+
+### What is a service broker?
+
+A service broker is a component that exposes the service offering to Cloud Foundry.
+
+It acts as an intermediary between Cloud Foundry and the actual service infrastructure.
+
+For example:
+
+![service_broker_communication](./images/service_broker_communication.png)
+
+The broker doesn't necessarily host the database itself. It can communicate with infrastructure managed by another system.
+
+### Important OSBAPI operations
+
+The API defines several operations. These are particularly important:
+
+| Operation      | Purpose                                               |
+| -------------- | ----------------------------------------------------- |
+| Catalog        | Discover available service offerings and plans        |
+| Provision      | Create a service instance                             |
+| Deprovision    | Delete a service instance                             |
+| Bind           | Create application-specific access credentials        |
+| Unbind         | Remove an application binding                         |
+| Update         | Change service plan or configuration, where supported |
+| Last operation | Check the progress of asynchronous operations         |
+
+Let's connect these to commands you've already used.
+
+#### A. Provision
+
+You execute:
+
+```
+cf create-service postgresql development postgres-db
+```
+
+Conceptually:
+
+```
+Cloud Controller
+       |
+       | Provision request
+       v
+Service Broker
+       |
+       v
+Create PostgreSQL database
+       |
+       v
+Return operation status
+```
+
+Some services provision asynchronously. Cloud Foundry may need to poll the broker to check whether provisioning has finished.
+
+#### B. Bind
+
+You execute:
+
+```
+cf bind-service user-management postgres-db
+```
+
+Conceptually:
+
+```
+Cloud Controller
+       |
+       | Bind request
+       v
+Service Broker
+       |
+       v
+Generate application credentials
+       |
+       v
+Return credentials
+       |
+       v
+VCAP_SERVICES
+```
+
+The credentials are then made available to your application through the service binding environment.
+
+#### C. Unbind and deprovision
+
+You execute:
+
+```
+cf unbind-service user-management postgres-db
+```
+
+This removes the application's binding.
+
+Then:
+
+```
+cf delete-service postgres-db
+```
+
+This requests deletion of the service instance itself.
+
+These are separate operations: unbinding an application doesn't automatically delete the database.
+
+### Synchronous vs asynchronous operations
+
+Not every service operation finishes immediately.
+
+For example, provisioning a database might take several minutes.
+
+The broker can respond with an indication that the operation is in progress. Cloud Foundry then checks its status through the OSBAPI last-operation mechanism.
+
+Conceptually:
+
+```
+Provision request
+       |
+       v
+Broker: operation accepted
+       |
+       v
+Cloud Controller checks status
+       |
+       +---- Still in progress
+       |          |
+       |          v
+       |      Check again
+       |
+       +---- Succeeded
+                  |
+                  v
+             Service ready
+```
+
+This is why a service can temporarily show a provisioning or update-in-progress status.
+
+Remember the distinction:
+
+- Cloud Controller coordinates the operation.
+- Service broker implements the service-management API.
+- Service provider infrastructure supplies the actual database or other service.
+
 ## CredHub (conceptual)
