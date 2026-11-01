@@ -1,9 +1,5 @@
-# Ignore everything by default
-*
-
-# But keep these files/folders
-!dist/
-!package.json
-!pnpm-lock.yaml
-!Procfile
-!manifest.yml
+node_modules/
+.pnpm-store/
+.git/
+.env
+.env.*
