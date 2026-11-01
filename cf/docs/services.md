@@ -91,10 +91,10 @@ cf create-service SERVICE_OFFERING SERVICE_PLAN INSTANCE_NAME
 For example, using illustrative names:
 
 ```
-cf create-service postgresql development user-db
+cf create-service postgresql development postgres-db
 ```
 
-This asks Cloud Foundry to provision a service instance named `user-db`.
+This asks Cloud Foundry to provision a service instance named `postgres-db`.
 
 The exact offering and plan names must match what your environment provides.
 
@@ -107,7 +107,7 @@ Some useful commands:
 cf services
 
 # Inspect a specific service instance
-cf service user-db
+cf service postgres-db
 
 # Show available service offerings and plans
 cf marketplace
@@ -117,7 +117,7 @@ Example output from `cf services` might look like:
 
 ```
 name       service       plan          bound apps
-user-db    postgresql    development   None
+postgres-db    postgresql    development   None
 ```
 
 Notice the `bound apps` column.
@@ -131,10 +131,10 @@ Other lifecycle commands include:
 
 ```
 # Update an instance's plan, if supported
-cf update-service user-db -p standard
+cf update-service postgres-db -p standard
 
 # Delete an instance
-cf delete-service user-db
+cf delete-service postgres-db
 ```
 
 Be careful with deletion: removing a service instance can result in loss of its associated data, depending on the service provider and its behavior.
@@ -145,7 +145,7 @@ Be careful with deletion: removing a service instance can result in loss of its 
 
 A service key is a set of credentials generated for a service instance.
 
-For example, imagine you have created a PostgreSQL service instance called `user-db`.
+For example, imagine you have created a PostgreSQL service instance called `postgres-db`.
 
 The service provider may generate credentials containing:
 
@@ -177,27 +177,27 @@ cf create-service-key SERVICE_INSTANCE SERVICE_KEY_NAME
 For example:
 
 ```
-cf create-service-key user-db user-db-key
+cf create-service-key postgres-db postgres-db-key
 ```
 
-This creates a service key called `user-db-key` for the existing `user-db` instance.
+This creates a service key called `postgres-db-key` for the existing `postgres-db` instance.
 
 To inspect it:
 
 ```
-cf service-key user-db user-db-key
+cf service-key postgres-db postgres-db-key
 ```
 
 To list the keys:
 
 ```
-cf service-keys user-db
+cf service-keys postgres-db
 ```
 
 To delete a key:
 
 ```
-cf delete-service-key user-db user-db-key
+cf delete-service-key postgres-db postgres-db-key
 ```
 
 ### Important security considerations
@@ -225,7 +225,7 @@ For example, your NestJS application needs to connect to PostgreSQL.
 You have already provisioned a service instance:
 
 ```
-Service instance: user-db
+Service instance: postgres-db
 Application:      user-management
 ```
 
@@ -248,12 +248,12 @@ cf bind-service APP_NAME SERVICE_INSTANCE
 For your project:
 
 ```
-cf bind-service user-management user-db
+cf bind-service user-management postgres-db
 ```
 
 This tells Cloud Foundry:
 
-> Bind the PostgreSQL service instance `user-db` to the application `user-management`.
+> Bind the PostgreSQL service instance `postgres-db` to the application `user-management`.
 
 After binding, you generally need to restart the application so the updated environment becomes available to its processes:
 
@@ -271,7 +271,7 @@ The output might look like:
 
 ```
 name       service       plan          bound apps
-user-db    postgresql    development   user-management
+postgres-db    postgresql    development   user-management
 ```
 
 The `bound apps` column now shows the application.
@@ -282,7 +282,7 @@ Let's follow the process.
 
 1. You execute the binding command
    ```
-   cf bind-service user-management user-db
+   cf bind-service user-management postgres-db
    ```
 2. Cloud Controller processes the request
 
@@ -314,17 +314,17 @@ applications:
       - nodejs_buildpack
     command: npm run start:prod
     services:
-      - user-db
+      - postgres-db
 ```
 
 Here:
 
 ```yaml
 services:
-  - user-db
+  - postgres-db
 ```
 
-means that the application should be bound to the existing service instance named `user-db`.
+means that the application should be bound to the existing service instance named `postgres-db`.
 
 When you deploy with:
 
@@ -345,7 +345,7 @@ Suppose you no longer want your NestJS application to use PostgreSQL.
 You can remove the binding:
 
 ```
-cf unbind-service user-management user-db
+cf unbind-service user-management postgres-db
 ```
 
 This removes the application-to-service binding.
@@ -355,7 +355,7 @@ It does not normally delete the service instance itself.
 To delete the service instance separately:
 
 ```
-cf delete-service user-db
+cf delete-service postgres-db
 ```
 
 Be careful: deleting a database service instance may result in data loss.
@@ -374,6 +374,232 @@ Be careful: deleting a database service instance may result in data loss.
 One important security distinction: both mechanisms provide access credentials. Neither should be treated as a substitute for network access controls or credential protection.
 
 ## `VCAP_SERVICES`
+
+### What is VCAP_SERVICES?
+
+`VCAP_SERVICES` is a system-provided environment variable that contains information about services bound to a Cloud Foundry application.
+
+It is provided by the Cloud Foundry platform when the application runs.
+
+For example, `nestjs-cf` application previously showed:
+
+```
+{
+  "VCAP_SERVICES": {}
+}
+```
+
+This was expected because there was no services bound.
+
+After binding a PostgreSQL service instance, the structure might look like this:
+
+```json
+{
+  "VCAP_SERVICES": {
+    "postgresql-db": [
+      {
+        "name": "postgres-db",
+        "label": "postgresql-db",
+        "plan": "trial",
+        "tags": ["relational", "database"],
+        "credentials": {
+          "hostname": "postgres.example.com",
+          "port": 5432,
+          "dbname": "userdb",
+          "username": "db_user",
+          "password": "generated-secret",
+          ...
+        },
+        ...
+      }
+    ]
+  }
+}
+```
+
+Illustrative example only. Actual property names and structure depend on the service broker.
+
+### Understanding the structure
+
+Let's break it down.
+
+| Property      | Meaning                                |
+| ------------- | -------------------------------------- |
+| `postgresql`  | Service label/category                 |
+| `name`        | Service instance name                  |
+| `label`       | Service offering label                 |
+| `plan`        | Provisioned service plan               |
+| `tags`        | Service tags                           |
+| `credentials` | Connection information and credentials |
+
+The most important part for your application is:
+
+```json
+{
+  "credentials": {
+    "hostname": "postgres.example.com",
+    "port": 5432,
+    "database": "userdb",
+    "username": "db_user",
+    "password": "generated-secret",
+    ...
+  }
+}
+```
+
+The application will use these values to establish a connection.
+
+### How does Node.js access VCAP_SERVICES?
+
+Because `VCAP_SERVICES` is an environment variable, you can access it through Node.js:
+
+```
+process.env.VCAP_SERVICES
+```
+
+Remember that environment variables are strings.
+
+Therefore, you need to parse the JSON:
+
+```js
+const vcapServices = JSON.parse(
+  process.env.VCAP_SERVICES ?? '{}',
+);
+
+console.log(vcapServices);
+```
+
+You can also inspect the application information:
+
+```js
+const vcapApplication = JSON.parse(
+  process.env.VCAP_APPLICATION ?? '{}',
+);
+
+console.log(vcapApplication.application_name);
+console.log(vcapApplication.space_name);
+```
+
+### Extracting PostgreSQL credentials
+
+Suppose your service binding produces the illustrative JSON structure shown earlier.
+
+You can retrieve the credentials like this:
+
+```js
+const vcapServices = JSON.parse(
+  process.env.VCAP_SERVICES ?? '{}',
+);
+
+const postgresServices = vcapServices['postgresql-db'];
+
+if (!postgresServices?.length) {
+  throw new Error('PostgreSQL service not bound');
+}
+
+const credentials = postgresServices[0].credentials;
+
+console.log(credentials.hostname);
+console.log(credentials.port);
+console.log(credentials.database);
+```
+
+Notice this part:
+
+```js
+vcapServices.['postgresql-db'][0].credentials
+```
+
+Why `[0]`?
+
+Because Cloud Foundry groups services by their service label, and each group contains an array. You might have multiple PostgreSQL service bindings.
+
+In production code, it's better to select the service by its instance name rather than blindly using the first array element.
+
+For example:
+
+```js
+const postgresService = postgresServices.find(
+  (service: any) => service.name === 'postgres-db',
+);
+
+if (!postgresService) {
+  throw new Error('postgres-db service not found');
+}
+
+const credentials = postgresService.credentials;
+```
+
+### VCAP_SERVICES vs. VCAP_APPLICATION
+
+You have already seen both variables in your actual CF environment output.
+
+They serve different purposes.
+
+| Variable           | Contains                                               |
+| ------------------ | ------------------------------------------------------ |
+| `VCAP_APPLICATION` | Application and deployment metadata                    |
+| `VCAP_SERVICES`    | Information about bound services and their credentials |
+
+For example:
+
+VCAP_APPLICATION
+
+```json
+{
+  "application_name": "user-management",
+  "space_name": "dev",
+  "application_uris": [
+    "user-management.cfapps.us10-001.hana.ondemand.com"
+  ]
+}
+```
+
+VCAP_SERVICES
+
+```json
+{
+  "postgresql": [
+    {
+      "name": "postgres-db",
+      "credentials": {
+        "hostname": "postgres.example.com",
+        "username": "db_user"
+      }
+    }
+  ]
+}
+```
+
+Think of it this way:
+
+- `VCAP_APPLICATION`: Information about my application.
+- `VCAP_SERVICES`: Information about the services my application consumes.
+
+### How to inspect VCAP_SERVICES in Cloud Foundry
+
+You can inspect the application environment using:
+
+```
+cf env user-management
+```
+
+This displays:
+- Application-defined environment variables.
+- Running environment variable groups.
+- Staging environment variable groups.
+- System-provided variables such as `VCAP_APPLICATION` and `VCAP_SERVICES`.
+
+After binding PostgreSQL, you should see the corresponding service information under `VCAP_SERVICES`.
+
+> Security reminder: `VCAP_SERVICES` can contain database passwords, tokens, and other sensitive credentials.
+
+Avoid:
+- Printing the entire variable in production logs.
+- Committing its contents to Git.
+- Exposing credentials through API responses.
+- Sharing unredacted output when troubleshooting.
+
 ## User-provided services
 ## Open Service Broker API
 ## CredHub (conceptual)
