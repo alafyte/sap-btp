@@ -197,6 +197,160 @@ cf push -f manifest.yml
 ```
 
 ## Environment variables
+
+There are four useful categories to understand:
+1. Application-defined variables.
+2. Running environment variable group.
+3. Staging environment variable group.
+4. System-provided variables.
+
+### 1. Application-defined variables
+
+These are variables you define for the application.
+
+For example, in `manifest.yml`:
+```yaml
+applications:
+  - name: user-management
+    env:
+      NODE_ENV: production
+      LOG_LEVEL: info
+```
+
+Or through the CLI:
+```
+cf set-env user-management LOG_LEVEL debug
+```
+
+Read them in NestJS/Node.js:
+```
+const logLevel = process.env.LOG_LEVEL;
+const nodeEnv = process.env.NODE_ENV;
+```
+
+These are application-specific configuration values.
+
+### 2. Running Environment Variable Group (App-Independent)
+
+The deployment shows:
+```
+LOG4J_FORMAT_MSG_NO_LOOKUPS: true
+```
+
+This is a platform-level environment variable group applied to running application processes.
+
+The important distinction:
+- It is not defined in your manifest.yml.
+- It is not specific to the application.
+- It is supplied by the Cloud Foundry platform configuration.
+
+Your Node.js process can still access it:
+```
+console.log(process.env.LOG4J_FORMAT_MSG_NO_LOOKUPS);
+```
+
+Although this particular variable is associated with Java logging, it can appear in the environment of a Node.js application too.
+
+### 3. Staging Environment Variable Group (App-Independent)
+
+These variables are available during the staging phase, when Cloud Foundry prepares your application.
+
+For example:
+- GIT_HTTP_USER_AGENT identifies the Git HTTP client user agent in relevant Git operations.
+- LOG4J_FORMAT_MSG_NO_LOOKUPS is also present in the staging environment.
+
+The difference between running and staging is important:   
+|                       Running environment   <br> |                          Staging environment   <br> |
+|:-------------------------------------------------|:----------------------------------------------------|
+|       Used when application processes run   <br> |       Used while application is being staged   <br> |
+| Available to your running Node.js process   <br> | Available to buildpack and staging processes   <br> |
+|                     Runtime configuration   <br> |             Build-time/staging configuration   <br> |
+
+You generally don't need to define these variables yourself.
+
+### 4. System-Provided Variables
+
+Cloud Foundry automatically provides metadata about your application and its environment.
+
+Two important variables are:
+- VCAP_APPLICATION
+- VCAP_SERVICES
+
+They contain JSON-formatted information.
+
+#### 4.1 VCAP_APPLICATION
+
+The deployment includes:
+
+```json
+{
+  "VCAP_APPLICATION": {
+    "cf_api": "https://api.cf.us10-001.hana.ondemand.com",
+    "limits": {
+      "fds": 32768
+    },
+    "application_name": "user-management",
+    "application_uris": [
+      "user-management.cfapps.us10-001.hana.ondemand.com"
+    ],
+    "name": "user-management",
+    "space_name": "dev",
+    "space_id": "...",
+    "organization_id": "...",
+    "organization_name": "...",
+    "application_id": "..."
+  }
+}
+```
+
+This provides metadata about the currently running application.   
+Let's look at the most useful properties:   
+|            Property   <br> |                          Meaning   <br> |
+|:---------------------------|:----------------------------------------|
+|  `application_name`   <br> |                 Application name   <br> |
+|    `application_id`   <br> |    Unique application identifier   <br> |
+|  `application_uris`   <br> |               Application routes   <br> |
+|        `space_name`   <br> | Space containing the application   <br> |
+|          `space_id`   <br> |          Unique space identifier   <br> |
+| `organization_name`   <br> |                Organization name   <br> |
+|   `organization_id`   <br> |   Unique organization identifier   <br> |
+|            `cf_api`   <br> |       Cloud Foundry API endpoint   <br> |
+|        `limits.fds`   <br> |            File descriptor limit   <br> |
+|              `name`   <br> |                 Application name   <br> |
+
+For example, your application can read its own route:
+```
+const appInfo = JSON.parse(
+  process.env.VCAP_APPLICATION ?? '{}',
+);
+
+console.log(appInfo.application_name);
+console.log(appInfo.application_uris);
+console.log(appInfo.space_name);
+```
+
+This can be useful when building diagnostics endpoints or application startup logging.
+You don't need to hardcode the application name, space, or route in your source code.
+
+#### 4.2 VCAP_SERVICES
+
+VCAP_SERVICES contains information about services bound to your application.
+
+You normally should not manually create or edit VCAP_APPLICATION or VCAP_SERVICES. Cloud Foundry manages these variables.
+
+### How do we inspect these variables?   
+
+These are useful commands to remember:   
+|                                Command   <br> |                                        Purpose   <br> |
+|:----------------------------------------------|:------------------------------------------------------|
+|               `cf env user-management`   <br> |      Inspect application environment variables   <br> |
+|                       `cf running-env`   <br> | Inspect the running environment variable group   <br> |
+|                       `cf staging-env`   <br> | Inspect the staging environment variable group   <br> |
+| `cf set-env user-management KEY value`   <br> |                    Set an application variable   <br> |
+|     `cf unset-env user-management KEY`   <br> |                 Remove an application variable   <br> |
+
+After changing an application environment variable, you generally need to restart or restage the application for the change to take effect, depending on the change.   
+
 ## Node.js buildpack
 ## Memory and instance scaling
 ## Logs and troubleshooting
