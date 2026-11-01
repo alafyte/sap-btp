@@ -558,4 +558,173 @@ The important part is that the Controller coordinates the deployment as one MTA 
 
 
 ## Deployment and troubleshooting
+
+Every MTA deployment is tracked as an operation by the MultiApps Controller.
+
+For example, when you execute:
+
+```
+cf deploy mta_archives/user-management_1.0.0.mtar
+```
+
+the controller creates a deployment operation with an operation ID.
+
+You can inspect operations using:
+
+```
+cf mta-ops
+```
+
+This lists deployment operations, including their IDs, MTA names, types, and statuses.
+
+To inspect a specific operation:
+
+```
+cf mta-ops -i <operation-id>
+```
+
+The exact available options can be checked with:
+
+```
+cf mta-ops --help
+```
+
+### Understanding deployment states
+
+A deployment operation goes through several stages.
+
+1. Upload
+
+   The MTAR is uploaded to the MultiApps Controller.
+2. Validation
+
+   The controller checks the deployment descriptor and dependencies.
+3. Resource processing
+
+   Required service instances are created, reused, or updated as appropriate.
+4. Application deployment
+
+   Application content is uploaded and deployed to Cloud Foundry.
+5. Binding and startup
+
+   Required services are bound and applications are started or updated.
+6. Completion
+
+   The operation finishes successfully or reports a failure.
+
+You may encounter statuses such as:
+
+| Status     | Meaning                          |
+| ---------- | -------------------------------- |
+| `RUNNING`  | Operation is in progress         |
+| `FINISHED` | Operation completed successfully |
+| `ERROR`    | Operation failed                 |
+| `ABORTED`  | Operation was aborted            |
+
+The precise status names and transitions depend on the MultiApps Controller version.
+
+### Inspecting an MTA
+
+There are two useful commands:
+
+List MTAs:
+
+```
+cf mtas
+```
+
+Inspect one MTA:
+
+```
+cf mta user-management
+```
+
+The second command gives you information about the MTA's deployment state and its managed modules and resources.
+
+This is different from:
+
+```
+cf app user-management
+```
+
+The distinction:
+
+- `cf mta` shows the MTA deployment perspective.
+- `cf app` shows the Cloud Foundry application perspective.
+
+You should become comfortable using both.
+
+### Downloading deployment logs
+
+Suppose your next deployment fails.
+
+For example:
+
+```
+Deployment of MTA user-management failed
+Error: Application deployment failed
+```
+
+The first place to investigate is the operation log.
+
+Use:
+
+```
+cf dmol -i <operation-id>
+```
+
+`dmol` means Download MTA Operation Logs.
+
+The command downloads the logs associated with that deployment operation.
+
+These logs can help identify:
+
+- Which module failed.
+- Which deployment step failed.
+- Whether a service operation failed.
+- Whether application staging failed.
+- Whether application startup failed.
+
+### Updating an MTA
+
+Let's say your current deployment is:
+
+```
+ID: user-management
+version: 1.0.0
+```
+
+You make a change and release:
+
+```
+ID: user-management
+version: 1.1.0
+```
+
+You rebuild:
+
+```
+mbt build -p=cf
+```
+
+Then deploy:
+
+```
+cf deploy mta_archives/user-management_1.1.0.mtar
+```
+
+The controller recognizes the MTA ID:
+
+```
+user-management
+```
+
+It treats this as an update to the existing MTA rather than an entirely unrelated application.
+
+It compares the desired deployment with the existing deployment and applies the necessary changes.
+
+**Important**: Changing the MTA version doesn't automatically mean every module will be redeployed. The controller determines which changes require deployment actions.
+
+Also, an MTA version is not the same as the version of the application or Node.js runtime.
+
 ## Blue-green deployments
