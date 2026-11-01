@@ -175,58 +175,6 @@ A resource represents something the application needs but that isn't itself a de
 
 For example, the PostgreSQL service.
 
-There are two important resource types to understand.
-
-#### A. Managed service
-
-```
-resources:
-  - name: postgres-db
-    type: org.cloudfoundry.managed-service
-    parameters:
-      service: postgresql-db
-      service-plan: development
-```
-
-This tells the MTA deployment process to provision a service through a service broker.
-
-The `service` and `service-plan` values must match the offering and plan available in your marketplace.
-
-#### B. Existing service
-
-If you already created `postgres-db` manually through the marketplace, rather than asking MTA to create another database, you can reference the existing instance:
-
-```yaml
-resources:
-  - name: postgres-db
-    type: org.cloudfoundry.existing-service
-    parameters:
-      service-name: postgres-db
-```
-
-This tells the deployment process to use the existing Cloud Foundry service instance.
-
-### Connecting a module to a resource
-
-Defining a resource doesn't automatically connect it to your application module.
-
-For that, we use `requires`.
-
-```yaml
-modules:
-  - name: user-management
-    type: nodejs
-    path: .
-    requires:
-      - name: postgres-db
-```
-
-The `name` under `requires` references the resource's MTA name.
-
-The deployment process uses this relationship to create the service binding.
-
-Notice that you don't need to repeat the database credentials in `mta.yaml`. The application will continue reading them from `VCAP_SERVICES`.
-
 ## Build and deployment parameters
 
 You can also configure how your module is built and deployed.
@@ -261,6 +209,203 @@ These should look familiar because they correspond to settings you've already us
 The formats aren't identical, but the concepts are familiar.
 
 ## MTA modules and resources
+
+### Modules: deployable application components
+
+A module represents a component that the MTA deployment process can deploy.
+
+Each module has a type that determines how it is handled.
+
+Some common module types include:
+
+| Module type        | Purpose                     | Example              |
+| ------------------ | --------------------------- | -------------------- |
+| `nodejs`           | Node.js application         | NestJS backend       |
+| `java`             | Java application            | Spring Boot backend  |
+| `html5`            | HTML5 application content   | SAPUI5 frontend      |
+| `approuter.nodejs` | Application Router          | SAP App Router       |
+| `hdb`              | SAP HANA database artifacts | HANA database module |
+
+These are examples of module types used in SAP BTP MTA projects. Not every project needs all of them.
+
+#### Example: multiple modules
+
+Imagine your application grows and you introduce a separate frontend and backend.
+
+Your project might look like this:
+
+```
+user-management/
+├── backend/
+│   ├── src/
+│   └── package.json
+├── frontend/
+│   └── ...
+├── approuter/
+│   ├── xs-app.json
+│   └── package.json
+└── mta.yaml
+```
+
+You could describe the deployable components like this:
+
+```yaml
+modules:
+  - name: user-management-backend
+    type: nodejs
+    path: backend
+
+  - name: user-management-frontend
+    type: html5
+    path: frontend
+
+  - name: user-management-approuter
+    type: approuter.nodejs
+    path: approuter
+```
+
+Each module can have its own build and deployment configuration.
+
+**Important**: A module isn't necessarily a separate business application. Several modules can work together to form one application.
+
+### Resources: external dependencies
+
+Resources describe services or infrastructure that modules need.
+
+For example:
+
+- PostgreSQL database.
+- XSUAA.
+- Destination service.
+- Connectivity service.
+
+A resource is not normally a deployable application module.
+
+There are several resource types worth knowing.
+
+#### A. Managed service
+
+```yaml
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: postgresql-db
+      service-plan: development
+```
+
+This asks the deployment process to provision a service through the service broker.
+
+**Remember**: the offering and plan must actually exist in your SAP BTP landscape.
+
+#### B. Existing service
+
+```yaml
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: postgres-db
+```
+
+This references a service instance that already exists.
+
+That's what we're using for your current PostgreSQL database.
+
+#### C. User-provided service
+
+You can also reference a user-provided service:
+
+```yaml
+resources:
+  - name: external-api
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: external-api
+```
+
+The service can be an existing user-provided service instance, not necessarily a marketplace-managed service.
+
+### Connecting modules and resources with `requires`
+
+Let's say your backend requires PostgreSQL.
+
+```yaml
+modules:
+  - name: user-management
+    type: nodejs
+    path: .
+    requires:
+      - name: postgres-db
+```
+
+And the resource:
+
+```yaml
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: postgres-db
+```
+
+When MTA is deployed, this relationship allows the deployment tooling to establish the service binding.
+
+### Understanding `provides` and `requires`
+
+So far, we've used `requires` to express dependencies.
+
+MTA also supports `provides`.
+
+It allows a module to expose information that another module can consume.
+
+For example, imagine your backend exposes an API URL that your App Router needs.
+
+The backend can provide that URL:
+
+```yaml
+modules:
+  - name: user-management-backend
+    type: nodejs
+    path: backend
+    provides:
+      - name: backend-api
+        properties:
+          url: ${default-url}
+```
+
+The App Router can consume it:
+
+```yaml
+modules:
+  - name: user-management-approuter
+    type: approuter.nodejs
+    path: approuter
+    requires:
+      - name: backend-api
+        group: destinations
+        properties:
+          name: backend
+          url: ~{url}
+          forwardAuthToken: true
+```
+
+Here:
+- `provides` declares information exposed by a module.
+- `requires` declares a dependency on that information.
+- `~{url}` references the property exposed by the provider.
+
+### Important distinction: module dependency vs service dependency
+
+These two relationships are different.
+
+| Dependency         | Example                         | Meaning                                                  |
+| ------------------ | ------------------------------- | -------------------------------------------------------- |
+| Module-to-resource | Backend requires PostgreSQL     | Backend needs a platform service                         |
+| Module-to-module   | App Router requires backend API | One application component needs information from another |
+
+This distinction becomes particularly important in larger MTAs.
+
 ## MBT
 ## MTAR archives
 ## `cf deploy`
