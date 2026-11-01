@@ -87,7 +87,114 @@ The exact version should be chosen according to the project's compatibility requ
 
 ## Application manifests
 
+### What is a manifest?
 
+An application manifest is a YAML file that describes how Cloud Foundry should deploy and configure your application.
+
+The default filename is:
+```
+manifest.yml
+```
+
+Instead of specifying every deployment option manually through CLI arguments, you declare them in one file.
+Think of it as a deployment configuration document.
+
+### The sample manifest
+
+Here's the simplified configuration:
+
+```yaml
+---
+applications:
+  - name: user-management
+    command: npm run start:prod
+    buildpacks:
+      - nodejs_buildpack
+```
+
+Let's understand each property.   
+|       Property   <br> |                                         Meaning   <br> |
+|:----------------------|:-------------------------------------------------------|
+| `applications`   <br> |                  List of applications to deploy   <br> |
+|         `name`   <br> |               Application name in Cloud Foundry   <br> |
+|      `command`   <br> |           Command used to start the application   <br> |
+|   `buildpacks`   <br> |      Buildpacks used to prepare the application   <br> |
+
+#### Application name
+```
+name: user-management
+```
+
+This is the name Cloud Foundry uses to identify your application.
+
+You can inspect it using:
+```
+cf apps
+```
+
+#### Start command
+```
+command: npm run start:prod
+```
+
+This corresponds to the [package.json](../nestjs-cf/package.json) script:
+```
+"start:prod": "node dist/main"
+```
+
+So the actual command executed is:
+```
+node dist/main
+```
+
+Remember that the NestJS application must listen on the port assigned by Cloud Foundry:
+```
+await app.listen(process.env.PORT ?? 3000);
+```
+Cloud Foundry provides the port through the PORT environment variable.
+
+#### Buildpacks
+
+```yaml
+buildpacks:
+  - nodejs_buildpack
+```
+
+A buildpack prepares the application to run in Cloud Foundry.
+
+For Node.js, it handles things such as:
+- Selecting the Node.js runtime.
+- Installing dependencies.
+- Preparing the application runtime.
+- Producing the droplet.
+
+The buildpack does not replace the application build process. It provides the environment in which the application is prepared and executed.
+
+Official reading: [App manifest attribute reference](https://docs.cloudfoundry.org/devguide/deploy-apps/manifest-attributes.html)
+
+### Manifest versus CLI arguments
+
+You can configure deployment through CLI arguments:
+```
+cf push user-management \
+  -i 2 \
+  -m 512M
+```
+
+Or through a manifest:
+```yaml
+applications:
+  - name: user-management
+    instances: 2
+    memory: 512M
+```
+
+The manifest is generally preferable for repeatable deployments because the configuration is version-controlled alongside your application.
+
+You can also use:
+```
+cf push -f manifest.yml
+```
 
 ## Environment variables
 ## Node.js buildpack
