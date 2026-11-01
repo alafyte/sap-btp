@@ -2,8 +2,16 @@ import { DataSourceOptions } from "typeorm";
 
 export const parseVCAP = (): DataSourceOptions => {
   if (process.env.VCAP_SERVICES) {
-    const services = JSON.parse(process.env.VCAP_SERVICES);
-    const postgresService = services['postgresql-db'][0].credentials;
+    const vcapServices = JSON.parse(process.env.VCAP_SERVICES);
+
+    const postgresServices = vcapServices['postgresql-db'];
+
+    if (!postgresServices?.length) {
+      throw new Error('PostgreSQL service not bound');
+    }
+
+    const postgresService = postgresServices[0].credentials;
+    
     return {
       type: 'postgres',
       host: postgresService.hostname,
@@ -16,7 +24,7 @@ export const parseVCAP = (): DataSourceOptions => {
       ssl: {
         rejectUnauthorized: true,
         ca: postgresService.sslrootcert,
-        cert: postgresService.sslcert, 
+        cert: postgresService.sslcert,
       },
     };
   } else {
