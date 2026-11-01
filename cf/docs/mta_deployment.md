@@ -407,6 +407,92 @@ These two relationships are different.
 This distinction becomes particularly important in larger MTAs.
 
 ## MBT
+
+MBT is the tool that builds the MTA project and produces an `.mtar` archive.
+
+Think of the MTA deployment process as three separate responsibilities:
+
+| Component                  | Responsibility                                                                                 |
+| -------------------------- | ---------------------------------------------------------------------------------------------- |
+| `mta.yaml`                 | Describes your application modules, resources, and dependencies                                |
+| MBT                        | Reads the descriptor, performs configured build steps, and packages the result into an `.mtar` |
+| MultiApps CLI + Controller | Sends the archive to Cloud Foundry and coordinates deployment                                  |
+
+The key distinction: MBT builds the deployment artifact; it does not deploy your application.
+
+### Build an MTA project
+
+From the directory containing your `mta.yaml`, run:
+
+```
+mbt build -p=cf
+```
+
+What happens conceptually:
+
+1. MBT reads and validates `mta.yaml`.
+2. It processes the module build configurations.
+3. It runs the relevant module build steps.
+4. It assembles the deployment descriptor and module artifacts.
+5. It packages the result into an `.mtar` archive.
+
+By default, the archive is placed in:
+
+```
+mta_archives/
+```
+
+For example, with `ID: user-management` and `version: 1.0.0`, the default archive name follows this pattern:
+
+```
+mta_archives/user-management_1.0.0.mtar
+```
+
+You can choose a different output directory or archive name:
+
+```
+mbt build -p=cf -t=dist
+mbt build -p=cf --mtar=user-management-release
+```
+
+The second command adds the `.mtar` extension if it is omitted.
+
+
+### MBT does not automatically know how to build every module
+
+This is particularly important for your NestJS project.
+
+Your local build command is:
+
+```
+pnpm run build
+```
+
+MBT needs to know how to produce the module's deployable files. That can be configured through the module's build parameters in `mta.yaml`, or handled through a custom build process.
+
+So don't assume that simply having this:
+
+```yaml
+modules:
+  - name: user-management
+    type: nodejs
+    path: .
+```
+
+will automatically run your NestJS build command and package exactly the files your application needs.
+
+### Useful MBT commands
+
+| Command                               | Purpose                 |
+| ------------------------------------- | ----------------------- |
+| `mbt -v`                              | Show MBT version        |
+| `mbt --help`                          | Show available commands |
+| `mbt build -p=cf`                     | Build for Cloud Foundry |
+| `mbt build --help`                    | Show build options      |
+| `mbt module-build -m=user-management` | Build one module        |
+
+For the full command reference, see the [MBT usage documentation](https://sap.github.io/cloud-mta-build-tool/usage).
+
 ## MTAR archives
 ## `cf deploy`
 ## Deployment and troubleshooting
