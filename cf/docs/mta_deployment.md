@@ -78,6 +78,188 @@ The workflow looks like this:
 An important distinction: MTA is not another application runtime. The application still runs on the Cloud Foundry runtime. MTA is the packaging and deployment model used to coordinate the application and its dependencies.
 
 ## `mta.yaml`
+
+`mta.yaml` is the MTA deployment descriptor.
+
+It describes:
+
+- The application name and version.
+- The deployable modules.
+- The resources required by those modules.
+- Dependencies between modules and resources.
+- Build and deployment configuration.
+
+It is written in YAML.
+
+A simplified example:
+
+```yaml
+_schema-version: "3.3"
+ID: user-management
+version: 1.0.0
+
+modules:
+  - name: user-management
+    type: nodejs
+    path: .
+
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.managed-service
+```
+
+This tells the MTA build and deployment tooling that there is a Node.js module and a managed service resource.
+
+### Understanding the top-level properties
+
+Let's go through the descriptor.
+
+#### `_schema-version`
+
+```yaml
+_schema-version: "3.3"
+```
+
+Identifies the MTA descriptor schema version.
+
+It tells the MTA tooling which descriptor format you're using. It is not your application version or Node.js version.
+
+#### `ID`
+
+```yaml
+ID: user-management
+```
+
+The unique identifier of the MTA application.
+
+Think of it as the identity of the overall MTA project.
+
+#### `version`
+
+```yaml
+version: 1.0.0
+```
+
+The MTA application version.
+
+This is independent of the application's `package.json` version, although you can keep them aligned if that makes versioning easier.
+
+### The `modules` section
+
+A module represents a deployable component of your MTA.
+
+For example:
+
+```yaml
+modules:
+  - name: user-management
+    type: nodejs
+    path: .
+```
+
+| Property | Meaning                      |
+| -------- | ---------------------------- |
+| `name`   | Module name                  |
+| `type`   | Module type                  |
+| `path`   | Location of its source files |
+
+The NestJS backend is a Node.js module.
+
+Other possible modules include HTML5 applications, Java applications, and application routers.
+
+An MTA can contain multiple modules.
+
+### The `resources` section
+
+A resource represents something the application needs but that isn't itself a deployable application module.
+
+For example, the PostgreSQL service.
+
+There are two important resource types to understand.
+
+#### A. Managed service
+
+```
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.managed-service
+    parameters:
+      service: postgresql-db
+      service-plan: development
+```
+
+This tells the MTA deployment process to provision a service through a service broker.
+
+The `service` and `service-plan` values must match the offering and plan available in your marketplace.
+
+#### B. Existing service
+
+If you already created `postgres-db` manually through the marketplace, rather than asking MTA to create another database, you can reference the existing instance:
+
+```yaml
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: postgres-db
+```
+
+This tells the deployment process to use the existing Cloud Foundry service instance.
+
+### Connecting a module to a resource
+
+Defining a resource doesn't automatically connect it to your application module.
+
+For that, we use `requires`.
+
+```yaml
+modules:
+  - name: user-management
+    type: nodejs
+    path: .
+    requires:
+      - name: postgres-db
+```
+
+The `name` under `requires` references the resource's MTA name.
+
+The deployment process uses this relationship to create the service binding.
+
+Notice that you don't need to repeat the database credentials in `mta.yaml`. The application will continue reading them from `VCAP_SERVICES`.
+
+## Build and deployment parameters
+
+You can also configure how your module is built and deployed.
+
+For example:
+
+```yaml
+modules:
+  - name: user-management
+    type: nodejs
+    path: .
+    parameters:
+      memory: 512M
+      disk-quota: 1G
+      instances: 1
+      buildpack: nodejs_buildpack
+      command: npm run start:prod
+```
+
+These should look familiar because they correspond to settings you've already used in `manifest.yml`.
+
+| `manifest.yml` | `mta.yaml`                     |
+| -------------- | ------------------------------ |
+| `name`         | Module `name`                  |
+| `memory`       | Module `parameters.memory`     |
+| `disk_quota`   | Module `parameters.disk-quota` |
+| `instances`    | Module `parameters.instances`  |
+| `buildpacks`   | Module `parameters.buildpack`  |
+| `command`      | Module `parameters.command`    |
+| `services`     | Module `requires`              |
+
+The formats aren't identical, but the concepts are familiar.
+
 ## MTA modules and resources
 ## MBT
 ## MTAR archives
