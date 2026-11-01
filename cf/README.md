@@ -18,15 +18,15 @@
    - [SAP BTP CLI](./docs/setup_and_tooling.md#sap-btp-cli)
    - [MultiApps CLI plugin](./docs/setup_and_tooling.md#multiapps-cli-plugin)
    - [Using `CF_HOME` to manage multiple environments](./docs/setup_and_tooling.md#using-cf_home-to-manage-multiple-environments)
-4. Deploy and Manage Node.js Applications
-   - `cf push`
-   - Application manifests
-   - Environment variables
-   - Node.js buildpack
-   - Memory and instance scaling
-   - Logs and troubleshooting
-   - Health checks
-   - Blue-green deployments
+4. [Deploy and Manage Node.js Applications](./docs/deploy_and_manage_apps.md)
+   - [`cf push`](./docs/deploy_and_manage_apps.md#cf-push)
+   - [Application manifests](./docs/deploy_and_manage_apps.md#application-manifests)
+   - [Environment variables](./docs/deploy_and_manage_apps.md#environment-variables)
+   - [Node.js buildpack](./docs/deploy_and_manage_apps.md#nodejs-buildpack)
+   - [Memory and instance scaling](./docs/deploy_and_manage_apps.md#memory-and-instance-scaling)
+   - [Logs and troubleshooting](./docs/deploy_and_manage_apps.md#logs-and-troubleshooting)
+   - [Health checks](./docs/deploy_and_manage_apps.md#health-checks)
+   - [Blue-green deployments](./docs/deploy_and_manage_apps.md#blue-green-deployments)
 5. Services and Service Bindings
    - Service Marketplace
    - Service instances
