@@ -1,0 +1,28 @@
+_schema-version: "3.3"
+ID: user-management
+version: 1.0.0
+
+modules:
+  - name: user-management
+    type: nodejs
+    path: .
+    parameters:
+      memory: 512M
+      disk-quota: 1G
+      instances: 1
+      buildpack: nodejs_buildpack
+      command: npm run start:prod
+    build-parameters:
+      builder: custom
+      ignore: ["node_modules/", "test/", "mta_archives/", "coverage/", ".vscode/"]
+      commands:
+        - pnpm install --frozen-lockfile
+        - pnpm run build
+    requires:
+      - name: postgres-db
+      
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: postgres-db
