@@ -562,4 +562,131 @@ When your application behaves unexpectedly, follow this order:
    Use `cf restage user-management` instead if you changed something that requires the buildpack to run again.
 
 ## Health checks
+
+A successful application start does not necessarily mean the application is ready to serve traffic. For example, NestJS might start listening on a port but still be unable to perform an essential initialization task.
+
+Cloud Foundry uses health checks to monitor application instances and decide when they are ready.
+
+### Health-check types
+
+Cloud Foundry supports three main health-check types.
+
+| Type      | How it works                                                           |
+| --------- | ---------------------------------------------------------------------- |
+| `port`    | Checks whether the application is listening on its assigned port       |
+| `http`    | Sends an HTTP request to a configured endpoint and checks the response |
+| `process` | Checks whether the application process is running                      |
+
+#### Port health check
+
+This is the default health-check type in Cloud Foundry.
+
+For the NestJS application, Cloud Foundry checks whether the application is listening on the assigned port.
+
+The existing code already supports this:
+
+```
+await app.listen(process.env.PORT ?? 3000);
+```
+
+Cloud Foundry provides the `PORT` environment variable, and your application must listen on that port.
+
+#### HTTP health check
+
+An HTTP health check sends a request to a specific endpoint, such as:
+
+```
+GET /health
+```
+
+Cloud Foundry expects a successful HTTP response (normally HTTP 2xx).
+
+This is useful when you want to verify that your application is actually responding to HTTP requests, rather than merely listening on a port.
+
+##### Process health check
+
+This checks whether the application process is running.
+
+It does not verify that the application can respond to HTTP requests.
+
+### Configure health checks in the manifest
+
+You can configure the health-check type in `manifest.yml`.
+
+For example, your current application could use:
+
+```
+applications:
+  - name: user-management
+    memory: 512M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: npm run start:prod
+    health-check-type: port
+```
+
+To use an HTTP health check instead:
+
+```
+applications:
+  - name: user-management
+    memory: 512M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: npm run start:prod
+    health-check-type: http
+    health-check-http-endpoint: /health
+```
+
+The second configuration assumes that your NestJS application implements `/health`.
+
+### Health-check timeout
+
+Sometimes an application needs additional time to start.
+
+For example, NestJS might need time to initialize modules or perform startup operations.
+
+You can configure a health-check timeout:
+
+```
+health-check-type: http
+health-check-http-endpoint: /health
+health-check-invocation-timeout: 10
+```
+
+This sets the timeout for an individual health-check invocation to 10 seconds. It is not the same as allowing the application 10 seconds for its entire startup.
+
+### Configure health checks using CLI
+
+You can also configure health checks without editing the manifest.
+
+```
+# Set port health check
+cf set-health-check user-management port
+
+# Set HTTP health check
+cf set-health-check user-management http --endpoint /health
+
+# Set process health check
+cf set-health-check user-management process
+
+# Inspect application configuration
+cf app user-management
+```
+
+### Important distinction: Health checks and application recovery
+
+Consider this scenario:
+
+1. You deploy three instances of your NestJS application.
+2. One instance crashes.
+3. Cloud Foundry detects that the instance is unhealthy.
+4. Cloud Foundry attempts to restore the desired number of running instances.
+
+This is part of Cloud Foundry's application recovery and convergence behavior.
+
+Health checks help Cloud Foundry determine whether instances are ready or healthy; Diego manages the actual application instances and their lifecycle.
+
 ## Blue-green deployments
