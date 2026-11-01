@@ -14,7 +14,7 @@ modules:
       command: npm run start:prod
     build-parameters:
       builder: custom
-      ignore: ["node_modules/", "test/", "mta_archives/", "coverage/", ".vscode/"]
+      ignore: ["node_modules/", "test/", "mta_archives/", "src/", "coverage/", ".vscode/"]
       commands:
         - pnpm install --frozen-lockfile
         - pnpm run build
