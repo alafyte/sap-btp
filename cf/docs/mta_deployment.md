@@ -728,3 +728,180 @@ It compares the desired deployment with the existing deployment and applies the 
 Also, an MTA version is not the same as the version of the application or Node.js runtime.
 
 ## Blue-green deployments
+
+### What are blue and green?
+
+Imagine your current application is running version 1.0.0.
+- Blue is the currently live application receiving production traffic.
+- Green is the new application version deployed separately for testing.
+
+Both versions can run simultaneously, but only one should receive normal production traffic at a time.
+
+![bg_deployment](./images/bg_deployment.png)
+
+The benefit is that the new version can be tested before the production route is switched. 
+
+The correct command is:
+```
+cf deploy <MTA_ARCHIVE> -f --strategy blue-green
+```
+
+### Understanding the deployment lifecycle
+
+Let's use the sample NestJS application.
+
+Currently we have:
+- MTA: user-management
+- Version: 1.0.0
+- Module: user-management
+- PostgreSQL service: postgres-db
+- One running production application.
+
+Suppose you develop a new version, 1.1.0.
+
+The goal is to deploy and test the new version without immediately replacing the existing production application.
+
+#### Phase 1 — Current production version (Blue)
+
+![blue_version](./images/blue_version.png)
+
+#### Phase 2 — Deploy the new version (Green / Idle)
+Build the new archive:
+```
+mbt build -p=cf --mtar=user-management_1.1.0
+```
+
+Then deploy it:
+```
+cf deploy mta_archives/user-management_1.1.0.mtar -f --strategy blue-green
+```
+
+The MultiApps Controller performs the following actions:
+1. Processes the MTA resources.
+2. Renames the existing application to a -live application.
+3. Creates the new application with an -idle suffix.
+4. Starts the new application.
+5. Creates temporary routes for testing the new version.
+6. Pauses the deployment and asks you to test or decide whether to continue.
+
+The actual application names are based on the module name. For example, they will follow names such as:
+```
+user-management-live
+user-management-idle
+```
+
+![bg_testing_phase](./images/bg_testing_phase.png)
+
+Both application versions are running concurrently.
+
+This is the key feature: the existing production application continues serving traffic while the new version is being tested. 
+
+#### Phase 3 — Test Green
+The deployment output provides the operation ID and temporary route.
+
+For example:
+```
+Operation ID: 12345678-xxxx-xxxx-xxxx-123456789abc
+
+Process has entered testing phase.
+
+Use:
+cf deploy -i <operation-id> -a abort
+
+or:
+cf deploy -i <operation-id> -a resume
+```
+
+You can now test the new application through its temporary route:
+```
+curl https://<temporary-idle-route>/api
+```
+
+Test important functionality:
+- The application starts successfully.
+- The endpoints work.
+- The service connections works.
+- No unexpected application errors appear.
+
+#### Phase 4 — Switch production traffic to Green
+If testing succeeds:
+```
+cf deploy -i <operation-id> -a resume
+```
+
+The controller then:
+1. Maps the production routes to the new idle application.
+2. Removes temporary routes.
+3. Restarts the idle application with its production route configuration.
+4. Deletes the old live application.
+
+![bg_after_dep](./images/bg_after_dep.png)
+
+The production route now points to the new version.
+
+#### Phase 5 — What if testing fails?
+You can abort the deployment:
+```
+cf deploy -i <operation-id> -a abort
+```
+
+This stops the blue-green deployment process without switching production traffic to Green.
+
+**Important**: Abort is not the same as rollback. The idle application and temporary routes may remain and need cleanup. The existing production version remains the live version. 
+
+### Important considerations
+#### A. Resource consumption
+During the testing phase, both versions run simultaneously.
+
+Your normal deployment:
+| Resource	| Normal |
+| --------- | ------ |
+|Instances | 1 |
+| Memory per instance | 512 MB |
+| Total application memory | 512 MB |
+
+During blue-green testing:
+| Resource | Blue | Green | Total |
+| -------- | ---- | ----- | ----- |
+| Instances | 1 | 1 | 2 |
+| Memory | 512 MB | 512 MB | 1,024 MB |
+
+You need enough CF memory quota to accommodate both versions. 
+
+#### B. Database compatibility
+This is particularly important for the application.
+
+For example, both application versions use the same PostgreSQL service instance:
+```
+Blue (1.0.0) ─────┐
+                  ├──── postgres-db
+Green (1.1.0) ────┘
+```
+
+Blue-green deployment does not create a separate database for Green.
+
+Also, blue-green deployment does not independently switch service instances or make database schema changes reversible. SAP explicitly notes that service updates happen first and that bound services are shared by both application versions. 
+
+For example, suppose version 1.1.0 introduces a new required database column.
+
+You must ensure version 1.0.0 can continue working with the changed schema during the testing phase. A safer approach is an expand-and-contract migration:
+1. Add the new column in a backward-compatible way.
+2. Deploy code that supports both old and new structures.
+3. Switch production traffic.
+4. Remove old compatibility code in a later release.
+#### C. What does -f mean?
+In the command:
+```
+cf deploy archive.mtar -f --strategy blue-green
+```
+
+-f means force deployment without asking for confirmation about aborting conflicting deployment operations.
+
+It does not mean:
+- Skip testing.
+- Automatically switch traffic.
+- Ignore application errors.
+To skip the testing phase, the separate option is:
+```
+--skip-testing-phase
+```
