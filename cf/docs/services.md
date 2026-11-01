@@ -215,6 +215,164 @@ Follow these practices:
 Also, a service key does not automatically make a database accessible over the internet. Network access, IP restrictions, and other provider-specific requirements still apply.
 
 ## Service bindings
+
+### What is a service binding?
+
+A service binding establishes a relationship between a Cloud Foundry application and a service instance.
+
+For example, your NestJS application needs to connect to PostgreSQL.
+
+You have already provisioned a service instance:
+
+```
+Service instance: user-db
+Application:      user-management
+```
+
+You create a binding between them.
+
+![service_binding](./images/service_binding.png)
+
+The binding allows the service broker to provide the application with the credentials and connection information needed to consume the service.
+
+Important: A binding does not mean that PostgreSQL runs inside your NestJS container. They remain separate resources.
+
+### Creating a service binding using CF CLI
+
+The command is:
+
+```
+cf bind-service APP_NAME SERVICE_INSTANCE
+```
+
+For your project:
+
+```
+cf bind-service user-management user-db
+```
+
+This tells Cloud Foundry:
+
+> Bind the PostgreSQL service instance `user-db` to the application `user-management`.
+
+After binding, you generally need to restart the application so the updated environment becomes available to its processes:
+
+```
+cf restart user-management
+```
+
+You can inspect the binding with:
+
+```
+cf services
+```
+
+The output might look like:
+
+```
+name       service       plan          bound apps
+user-db    postgresql    development   user-management
+```
+
+The `bound apps` column now shows the application.
+
+### What happens internally?
+
+Let's follow the process.
+
+1. You execute the binding command
+   ```
+   cf bind-service user-management user-db
+   ```
+2. Cloud Controller processes the request
+
+   Cloud Controller manages the application and service-binding relationship.
+3. The service broker participates
+
+   Cloud Foundry coordinates with the service broker to establish the service binding and obtain the binding credentials.
+4. Credentials become available to the application
+
+   Cloud Foundry exposes service information through the system-provided `VCAP_SERVICES` environment variable.
+5. The application reads the credentials
+
+   Your NestJS application can read `VCAP_SERVICES` and use the PostgreSQL connection details.
+
+The exact provisioning and credential-generation behavior depends on the service broker and service offering.
+
+### Service bindings in manifest.yml
+
+You can also declare service bindings in your application manifest.
+
+For example:
+
+```yaml
+applications:
+  - name: user-management
+    memory: 512M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: npm run start:prod
+    services:
+      - user-db
+```
+
+Here:
+
+```yaml
+services:
+  - user-db
+```
+
+means that the application should be bound to the existing service instance named `user-db`.
+
+When you deploy with:
+
+```
+cf push
+```
+
+Cloud Foundry processes the declared binding as part of the application deployment configuration.
+
+Note: The service instance must already exist, and the relevant service and plan must be available in your space.
+
+Also, removing a service from the manifest does not necessarily unbind an existing binding automatically. Manage existing bindings explicitly.
+
+### Unbinding a service
+
+Suppose you no longer want your NestJS application to use PostgreSQL.
+
+You can remove the binding:
+
+```
+cf unbind-service user-management user-db
+```
+
+This removes the application-to-service binding.
+
+It does not normally delete the service instance itself.
+
+To delete the service instance separately:
+
+```
+cf delete-service user-db
+```
+
+Be careful: deleting a database service instance may result in data loss.
+
+### Service key vs. service binding — final comparison
+
+| Feature               | Service key                      | Service binding                      |
+| --------------------- | -------------------------------- | ------------------------------------ |
+| Associated with       | Service instance                 | Application and service instance     |
+| Credentials           | Generated for independent access | Provided for application consumption |
+| Typical consumer      | External client                  | Application                          |
+| Credentials retrieval | `cf service-key`                 | `VCAP_SERVICES`                      |
+| CLI creation          | `cf create-service-key`          | `cf bind-service`                    |
+| CLI deletion          | `cf delete-service-key`          | `cf unbind-service`                  |
+
+One important security distinction: both mechanisms provide access credentials. Neither should be treated as a substitute for network access controls or credential protection.
+
 ## `VCAP_SERVICES`
 ## User-provided services
 ## Open Service Broker API
