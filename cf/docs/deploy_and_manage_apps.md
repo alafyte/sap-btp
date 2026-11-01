@@ -352,7 +352,113 @@ These are useful commands to remember:
 After changing an application environment variable, you generally need to restart or restage the application for the change to take effect, depending on the change.   
 
 ## Node.js buildpack
+
+The Node.js buildpack prepares the Node.js application to run in Cloud Foundry. It detects the application type, installs the required runtime and dependencies, and creates a deployable droplet.
+
+### What happens during staging?
+
+![staging_process](./images/staging_process.png)
+
+### Important configuration
+
+| Configuration                    | Purpose                                                 |
+| -------------------------------- | ------------------------------------------------------- |
+| `buildpacks: [nodejs_buildpack]` | Selects the Node.js buildpack                           |
+| `engines.node` in `package.json` | Specifies the desired Node.js version                   |
+| lock files                       | Provides dependency version information                 |
+| `command` in manifest            | Specifies how the application starts                    |
+
+### What happened in nestjs-cf deployment?
+
+Your successful staging log showed:
+
+- Node.js buildpack version `1.9.6`.
+- Stack `cflinuxfs5`.
+- Node.js `22.23.4` selected because you hadn't specified a Node.js version.
+- pnpm `12.15.0` installed by the buildpack.
+- Staging completed and a droplet of approximately 119.7 MB was created.
+
+Key takeaway: The buildpack prepares your application; it does not run your application continuously. That happens after staging, when Cloud Foundry starts the application instance.
+
 ## Memory and instance scaling
+
+Cloud Foundry lets you control two important deployment dimensions:
+
+1. Memory: How much memory each application instance can use.
+2. Instances: How many copies of your application run.
+
+### Memory per instance
+
+The [manifest](../nestjs-cf/manifest.yml) currently specifies:
+
+```yaml
+applications:
+  - name: user-management
+    memory: 512M
+    instances: 1
+```
+
+This means each instance receives a memory limit of 512 MB.
+
+If the application exceeds its available memory, it can be terminated due to memory pressure.
+
+### 2. Instance scaling
+
+Suppose you increase the instance count:
+
+```yaml
+applications:
+  - name: user-management
+    memory: 512M
+    instances: 3
+```
+
+Cloud Foundry runs three instances of your NestJS application.
+
+![scaling](./images/scaling.png)
+
+This is the memory quota consumed by those three instances, subject to Cloud Foundry's accounting and quota rules.
+
+### 3. Vertical vs. horizontal scaling
+
+| Type               | What changes?       | Example       |
+| ------------------ | ------------------- | ------------- |
+| Vertical scaling   | Memory per instance | 512 MB → 1 GB |
+| Horizontal scaling | Number of instances | 1 → 3         |
+
+Useful commands:
+
+```
+# Inspect current application configuration
+cf app user-management
+
+# Scale to 3 instances
+cf scale user-management -i 3
+
+# Increase memory per instance
+cf scale user-management -m 1G
+
+# Change both
+cf scale user-management -i 3 -m 1G
+```
+
+### 4. Why multiple instances matter
+
+Cloud Foundry's Gorouter distributes incoming requests across available application instances.
+
+For example:
+
+```
+                Client requests
+                       |
+                    Gorouter
+                  /    |    \
+                 /     |     \
+           Instance 1  2     3
+```
+
+This improves the application's ability to handle concurrent traffic and provides resilience if an individual instance fails.
+
 ## Logs and troubleshooting
 ## Health checks
 ## Blue-green deployments
