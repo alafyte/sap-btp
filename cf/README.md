@@ -34,29 +34,16 @@
    - [User-provided services](./docs/services.md#user-provided-services)
    - [Open Service Broker API](./docs/services.md#open-service-broker-api)
    - [CredHub (conceptual)](./docs/services.md#credhub-conceptual)
-6. SAP BTP Authentication and Authorization
-   - OAuth 2.0
-   - XSUAA
-   - JWT
-   - Scopes and role templates
-   - Role collections
-   - `@sap/xssec`
-   - Token propagation
-7. Application Router and Destinations
-   - Application Router architecture
-   - `@sap/approuter`
-   - `xs-app.json`
-   - Authentication through App Router
-8. MTA Deployment
-   - MTA concepts and architecture
-   - `mta.yaml`
-   - MTA modules and resources
-   - MBT
-   - MTAR archives
-   - `cf deploy`
-   - Deployment and troubleshooting
-   - Blue-green deployments
-9. Production Operations
+6. [MTA Deployment](./docs/mta_deployment.md)
+   - [MTA concepts and architecture](./docs/mta_deployment.md#mta-concepts-and-architecture)
+   - [`mta.yaml`](./docs/mta_deployment.md#mtayaml)
+   - [MTA modules and resources](./docs/mta_deployment.md#mta-modules-and-resources)
+   - [MBT](./docs/mta_deployment.md#mbt)
+   - [MTAR archives](./docs/mta_deployment.md#mtar-archives)
+   - [`cf deploy`](./docs/mta_deployment.md#cf-deploy)
+   - [Deployment and troubleshooting](./docs/mta_deployment.md#deployment-and-troubleshooting)
+   - [Blue-green deployments](./docs/mta_deployment.md#blue-green-deployments)
+7. Production Operations
    - Application monitoring
    - Logging and troubleshooting
    - Scaling and availability
