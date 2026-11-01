@@ -460,5 +460,106 @@ For example:
 This improves the application's ability to handle concurrent traffic and provides resilience if an individual instance fails.
 
 ## Logs and troubleshooting
+
+Cloud Foundry provides several ways to inspect application logs, events, and runtime status.
+
+### 1. Application logs
+
+Logs help you understand what happens during application execution.
+
+For example, the `nestjs-cf` application might produce:
+
+```
+[Nest] 1  - LOG [NestFactory] Starting Nest application...
+[Nest] 1  - LOG [InstanceLoader] AppModule dependencies initialized
+[Nest] 1  - LOG [RoutesResolver] UserController {/users}
+[Nest] 1  - LOG [NestApplication] Nest application successfully started
+```
+
+Cloud Foundry collects application logs and makes them available through the CLI.
+
+Important commands:
+
+| Command                            | Purpose                             |
+| ---------------------------------- | ----------------------------------- |
+| `cf logs user-management`          | Stream application logs             |
+| `cf logs user-management --recent` | Display recent logs                 |
+| `cf app user-management`           | Inspect application status          |
+| `cf events user-management`        | Show application lifecycle events   |
+| `cf crashlogs user-management`     | Inspect logs from crashed instances |
+
+### 2. Understanding log types
+
+Cloud Foundry logs can contain different types of messages.
+
+| Log type | Meaning                    |
+| -------- | -------------------------- |
+| `OUT`    | Standard output (`stdout`) |
+| `ERR`    | Standard error (`stderr`)  |
+| `RTR`    | Router-related logs        |
+| `STG`    | Staging-related logs       |
+
+For example:
+
+- NestJS `console.log()` messages generally appear as `OUT`.
+- NestJS `console.error()` messages generally appear as `ERR`.
+- Requests routed through Gorouter can produce `RTR` entries.
+- Buildpack and staging messages can appear as `STG`.
+
+### 3. Application logs vs. staging logs
+
+This distinction is particularly important.
+
+Staging phase (STG):
+- Buildpack detection
+- Node.js installation
+- Dependency installation
+- Application build and droplet creation
+
+Runtime phase (OUT / ERR):
+- NestJS startup
+- API requests
+- Application errors
+- Runtime exceptions
+
+Routing phase (RTR):
+- Incoming HTTP requests
+- Response status codes
+- Request routing information
+
+For example, if your deployment fails because a dependency cannot be installed, investigate staging logs.
+
+If your application starts successfully but the endpoint returns HTTP 500, investigate runtime logs.
+
+### A practical troubleshooting workflow
+
+When your application behaves unexpectedly, follow this order:
+
+1. Check application status
+   ```
+   cf app user-management
+   ```
+   Check whether the application is running and how many instances are healthy.
+2. Check recent logs
+   ```
+   cf logs user-management --recent
+   ```
+   Look for startup errors, exceptions, and crash messages.
+3. Inspect application events
+   ```
+   cf events user-management
+   ```
+   Look for crashes, restarts, and other lifecycle events.
+4. Stream live logs
+   ```
+   cf logs user-management
+   ```
+   Keep this running while reproducing the problem.
+5. Apply the appropriate fix and redeploy or restart
+   ```
+   cf restart user-management
+   ```
+   Use `cf restage user-management` instead if you changed something that requires the buildpack to run again.
+
 ## Health checks
 ## Blue-green deployments
