@@ -307,4 +307,135 @@ When preparing an application for production:
 Remember that blue-green deployment can temporarily require resources for both old and new application versions. Plan for that extra capacity.
 
 ## Production release management
+
+### Application versioning
+
+The MTA descriptor contains an application ID and version:
+
+```yaml
+_schema-version: "3.3"
+ID: user-management
+version: 1.0.0
+```
+
+When you prepare a new release, update the version:
+
+```yaml
+_schema-version: "3.3"
+ID: user-management
+version: 1.1.0
+```
+
+The distinction:
+
+| Property    | Meaning                                       |
+| ----------- | --------------------------------------------- |
+| `ID`        | Identifies the MTA application                |
+| `version`   | Identifies the MTA release version            |
+| Module name | Identifies an individual deployable component |
+| MTAR        | Packaged deployment artifact                  |
+
+For the `nestjs-cf` project:
+
+```
+user-management
+    |
+    +-- Version 1.0.0
+    |      user-management_1.0.0.mtar
+    |
+    +-- Version 1.1.0
+           user-management_1.1.0.mtar
+```
+
+Keep the same MTA ID when releasing a new version of the same application.
+
+### A typical production release process
+
+A release should follow a controlled sequence.
+
+1. Develop
+
+   Implement changes in your NestJS application.
+2. Build
+
+   Compile the application and build the MTAR.
+
+   `mbt build -p=cf`
+3. Validate
+
+   Check the archive, configuration, dependencies, and version.
+4. Deploy
+
+   Deploy the MTAR to the target Cloud Foundry space.
+
+   `cf deploy mta_archives/user-management_1.1.0.mtar`
+5. Verify
+
+   Inspect application state, logs, routes, and API behavior.
+6. Release
+
+   Confirm the new version is operating correctly and communicate the release.
+
+### Deployment versus release
+
+These concepts are related but different.
+
+- Deployment: Installing or updating the application in the target environment.
+- Release: Making that version available for its intended users after the required validation.
+
+For example, a new version could be deployed but not yet released to users while it is being tested.
+
+This distinction is especially useful with blue-green deployment.
+
+### Rollback considerations
+
+Suppose you have:
+
+- Version 1.0.0 running successfully.
+- Version 1.1.0 deployed.
+- A bug discovered in 1.1.0.
+
+You need a recovery strategy.
+
+There are two important cases:
+
+#### Case A — Application-only changes
+
+If the database schema remains compatible, deploying a previously validated MTAR may be a viable rollback approach.
+
+#### Case B — Database schema changes
+
+This is more complicated.
+
+Imagine version 1.1.0 changes a database column or removes a field that version 1.0.0 expects. Simply deploying version 1.0.0 again may not restore compatibility.
+
+This is why production database changes need careful planning.
+
+### Expand-contract migration strategy
+
+A common approach is:
+
+1. Expand: Add new database structures without immediately removing old ones.
+2. Migrate: Update the application to use the new structures.
+3. Contract: Remove obsolete structures only after old application versions no longer depend on them.
+
+For example:
+
+```
+Release 1.0.0
+    Uses: first_name
+
+Release 1.1.0
+    Supports: first_name + full_name
+    Migrates data to full_name
+
+Release 1.2.0
+    Uses: full_name
+    Removes first_name (when safe)
+```
+
+This helps maintain compatibility during deployments and rollback windows.
+
+**Important**: Keep your MTAR artifacts versioned and stored somewhere reliable. Don't depend on rebuilding an old release from whatever happens to be in your current source branch.
+
 ## Security and secrets management
