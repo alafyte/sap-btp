@@ -2,6 +2,7 @@
 
 1. [Cloud Foundry Core Foundations](docs/cf-core-foundations.md)
    - [Cloud Foundry overview and architecture](docs/cf-core-foundations.md#cloud-foundry-overview-and-architecture)
+   - [BOSH](docs/cf-core-foundations.md#bosh)
    - [Diego architecture and scheduling](docs/cf-core-foundations.md#diego-architecture-and-scheduling)
    - [Staging and buildpacks](docs/cf-core-foundations.md#staging-and-buildpacks)
    - [Orgs, spaces, roles and permissions](docs/cf-core-foundations.md#orgs-spaces-roles-and-permissions)

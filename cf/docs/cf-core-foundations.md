@@ -170,6 +170,166 @@ A developer can access application logs using:
 cf logs my-node-app
 ```
 
+## BOSH
+
+BOSH is an open-source toolchain for deploying, managing, updating, and monitoring distributed systems across cloud infrastructure.
+
+It is used to manage the infrastructure and platform components on which Cloud Foundry runs.
+
+Think of it this way:
+
+- Cloud Foundry manages your applications.
+- BOSH manages the virtual machines and platform software that make Cloud Foundry possible.
+
+Official reading: [Understanding BOSH](https://www.bosh.io/docs/understanding-bosh).
+
+### Where does BOSH fit in the architecture?
+
+Consider this simplified architecture:
+
+![cf_bosh](./images/cf_bosh.png)
+
+For example, BOSH can deploy the VMs that host Diego Cells, Cloud Controller components, and Gorouters.
+
+Cloud Foundry then uses those components to run and manage your applications.
+
+### The four important BOSH concepts
+
+These are the concepts worth remembering.
+
+#### A. BOSH Director
+
+The Director is the central management component.
+
+It coordinates:
+
+- Creating and deleting VMs.
+- Deploying software.
+- Updating deployments.
+- Monitoring VM health.
+- Replacing failed VMs when configured to do so.
+
+You interact with it through the BOSH CLI.
+
+#### B. Stemcell
+
+A stemcell is a versioned base operating system image containing the BOSH Agent.
+
+Think of it as a prepared VM template.
+
+For example:
+
+```
+Stemcell
+   |
+   +-- Operating system
+   +-- BOSH Agent
+   +-- Basic utilities
+```
+
+BOSH uses stemcells to create VMs on the underlying infrastructure.
+
+#### C. Release
+
+A BOSH release contains software packages, configuration templates, and scripts that define the software jobs running on VMs.
+
+For example, a release might provide the software needed to run a particular Cloud Foundry component.
+
+A release is versioned, allowing operators to manage software updates.
+
+#### D. Deployment manifest
+
+A deployment manifest is a YAML file describing what BOSH should deploy.
+
+It specifies things such as:
+
+- Releases and versions.
+- Stemcells.
+- VM instance groups.
+- Resource requirements.
+- Networks.
+- Configuration properties.
+
+The Director uses this manifest to create and manage the deployment.
+
+### How the four concepts work together
+
+
+A useful way to remember it:
+
+| Component | Analogy                       |
+| --------- | ----------------------------- |
+| Stemcell  | Operating system template     |
+| Release   | Software installation package |
+| Manifest  | Deployment instructions       |
+| Director  | Deployment manager            |
+
+Official reading: [Components of BOSH](https://bosh.io/docs/bosh-components).
+
+### What happens when a VM crashes?
+
+Imagine one of your Cloud Foundry Diego Cells fails.
+
+At the infrastructure level:
+
+1. The BOSH Health Monitor receives VM health information.
+2. It detects that the VM is missing or unhealthy.
+3. If the Resurrector is enabled and configured, BOSH can recreate the VM.
+4. The replacement VM is created from the appropriate stemcell.
+5. BOSH Agent receives instructions to install and configure the required software.
+
+This is infrastructure-level recovery.
+
+Compare that with Diego:
+
+| Responsibility                        | BOSH                 | Diego                       |
+| ------------------------------------- | -------------------- | --------------------------- |
+| Manage infrastructure VMs             | Yes                  | No                          |
+| Recover failed platform VMs           | Yes, when configured | No                          |
+| Manage application instances          | No                   | Yes                         |
+| Recover crashed application instances | No                   | Yes                         |
+| Run the application                   | No                   | Yes, through the CF runtime |
+
+This distinction is particularly important: BOSH repairs the platform infrastructure; Diego manages application processes and instances.
+
+### BOSH commands
+
+Platform operators use the BOSH CLI rather than the regular CF CLI.
+
+Some common commands:
+
+```
+# Display BOSH environment information
+bosh env
+
+# List deployments
+bosh deployments
+
+# List VMs in a deployment
+bosh -d <deployment-name> vms
+
+# Inspect deployment details
+bosh -d <deployment-name> instances
+
+# List recent BOSH operations
+bosh tasks --recent=10
+```
+
+You generally won't need these commands when deploying the applications to a managed SAP BTP Cloud Foundry environment.
+
+### What about SAP BTP?
+
+SAP operates the managed Cloud Foundry environment on SAP BTP. As an application developer, you normally interact with it through:
+
+- SAP BTP Cockpit.
+- CF CLI.
+- MultiApps CLI.
+- Application and service APIs.
+
+You don't normally manage the underlying BOSH Director, stemcells, or Diego Cell VMs yourself.
+
+[SAP's documentation](https://help.sap.com/docs/btp/sap-business-technology-platform/additional-information-about-cloud-foundry?utm_source=chatgpt.com) lists BOSH as additional Cloud Foundry background information.
+
 ## Diego architecture and scheduling
 
 For learning purposes, divide Diego into four main areas:
