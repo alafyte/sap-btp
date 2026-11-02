@@ -203,5 +203,108 @@ Application · PostgreSQL · configuration · platform · deployment
 Production tip: Avoid restarting an application as your first troubleshooting step. A restart can temporarily hide the symptom and remove useful diagnostic context. Capture relevant logs and events first.
 
 ## Capacity planning and availability
+
+### Understand the resource model
+
+Cloud Foundry applications have resource limits such as:
+- Memory: RAM allocated to each application instance.
+- Disk quota: Disk space allocated to each instance.
+- Instance count: Number of application instances.
+
+For example, the current configuration is:
+
+```yaml
+applications:
+  - name: user-management
+    memory: 512M
+    disk_quota: 1G
+    instances: 1
+```
+
+This means:
+
+| Setting                             | Value  |
+| ----------------------------------- | ------ |
+| Instances                           | 1      |
+| Memory per instance                 | 512 MB |
+| Total application memory allocation | 512 MB |
+| Disk quota per instance             | 1 GB   |
+
+### Calculate memory requirements
+
+Cloud Foundry allocates memory per instance.
+
+Suppose you change the configuration:
+
+```yaml
+applications:
+  - name: user-management
+    memory: 512M
+    instances: 3
+```
+
+Then: 3 x 512 = 1536 MB
+
+Remember: the services have their own resource allocation. Their memory is not included in the application's memory calculation.
+
+### Why multiple instances improve availability
+
+Suppose the application runs with three instances:
+
+- Instance 1 crashes.
+- Instances 2 and 3 remain healthy.
+- Cloud Foundry can continue routing requests to the remaining available instances.
+
+This improves resilience, but it does not guarantee uninterrupted service.
+
+For example:
+- All instances could fail due to the same application bug.
+- Database could become unavailable.
+- A shared external dependency could fail.
+- The application could run out of space or quota.
+
+Important for Node.js servers: multiple instances do not share in-memory state.
+
+If instance 1 stores a user session in memory, instance 2 cannot automatically access it. Use an appropriate shared storage mechanism for state that must be available across instances.
+
+### Quotas and capacity planning
+
+Even if your application manifest requests 3 GB of memory, your space or org must have enough available quota.
+
+For example:
+
+| Application        | Memory allocation |
+| ------------------ | ----------------- |
+| user-management    | 1.5 GB            |
+| order-service      | 1 GB              |
+| project-management | 1 GB              |
+| Total              | 3.5 GB            |
+
+If your available memory quota is only 3 GB, you cannot allocate all these resources simultaneously.
+
+Useful commands:
+
+```
+cf space
+cf org
+cf apps
+cf app user-management
+```
+
+Actual quota reporting and available details can depend on your CF landscape and permissions.
+
+### Capacity planning principles
+
+When preparing an application for production:
+
+1. Measure actual memory and CPU usage under realistic load.
+2. Estimate expected concurrent traffic.
+3. Choose an appropriate instance size.
+4. Choose an instance count that supports expected load and failure tolerance.
+5. Leave room for deployments, scaling, and temporary resource increases.
+6. Revisit capacity as traffic and application behavior change.
+
+Remember that blue-green deployment can temporarily require resources for both old and new application versions. Plan for that extra capacity.
+
 ## Production release management
 ## Security and secrets management
