@@ -439,3 +439,43 @@ This helps maintain compatibility during deployments and rollback windows.
 **Important**: Keep your MTAR artifacts versioned and stored somewhere reliable. Don't depend on rebuilding an old release from whatever happens to be in your current source branch.
 
 ## Security and secrets management
+
+### Credential rotation
+
+Credential rotation means replacing an existing credential with a new one.
+
+Why rotate credentials?
+
+- A credential may have been exposed.
+- An employee or contractor may leave.
+- A security policy may require periodic rotation.
+- A third-party integration may have been compromised.
+
+A typical rotation process:
+
+1. Create or obtain a new credential.
+2. Configure the application or integration to use it.
+3. Verify that the new credential works.
+4. Revoke the old credential.
+5. Verify that the application continues operating normally.
+
+Be careful: the exact rotation process depends on the service broker. Some services support updating credentials or creating new bindings; others require a different procedure.
+
+### Avoid exposing secrets
+
+Never log the complete `VCAP_SERVICES` variable:
+
+```js
+// DON'T DO THIS
+console.log(process.env.VCAP_SERVICES);
+```
+
+It may contain passwords, certificates, and other sensitive information.
+
+Also avoid:
+
+- Committing `.env` files containing production credentials.
+- Putting passwords directly into `manifest.yml` or `mta.yaml`.
+- Including secrets in exception messages.
+- Sharing service-key output in tickets or screenshots.
+- Sending credentials through unsecured communication channels.
