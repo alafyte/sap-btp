@@ -43,13 +43,12 @@
    - [`cf deploy`](./docs/mta_deployment.md#cf-deploy)
    - [Deployment and troubleshooting](./docs/mta_deployment.md#deployment-and-troubleshooting)
    - [Blue-green deployments](./docs/mta_deployment.md#blue-green-deployments)
-7. Production Operations
-   - Application monitoring
-   - Logging and troubleshooting
-   - Scaling and availability
-   - Application updates
-   - Deployment strategies
-   - Security and secrets management
+7. [Production Operations](./docs/production_operations.md)
+   - [Application monitoring](./docs/production_operations.md#application-monitoring)
+   - [Troubleshooting](./docs/production_operations.md#troubleshooting)
+   - [Capacity planning and availability](./docs/production_operations.md#capacity-planning-and-availability)
+   - [Production release management](./docs/production_operations.md#production-release-management)
+   - [Security and secrets management](./docs/production_operations.md#security-and-secrets-management)
 
 ## Official documentation to bookmark
 
