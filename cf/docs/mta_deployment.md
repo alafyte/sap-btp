@@ -556,6 +556,206 @@ The important part is that the Controller coordinates the deployment as one MTA 
 | Deployment tracking | CF app operations            | MTA operations                    |
 | Main tool           | CF CLI                       | MultiApps CLI plugin              |
 
+## MTA Extension Descriptors
+
+Imagine you want to deploy `user-management` into three environments:
+
+| Setting             | Development  | Test          | Production    |
+| ------------------- | ------------ | ------------- | ------------- |
+| Instances           | 1            | 2             | 3             |
+| Memory per instance | 512 MB       | 512 MB        | 1 GB          |
+| PostgreSQL service  | postgres-dev | postgres-test | postgres-prod |
+
+You could maintain three different `mta.yaml` files, but that creates duplication and makes application maintenance harder.
+
+Instead, keep one common `mta.yaml` and create environment-specific `.mtaext` files.
+
+![mtaxt](./images/mtaext.png)
+
+The extension provides additional deployment configuration. It doesn't require you to build a different application archive for each environment.
+
+### Structure of `.mtaext`
+
+Let's use the example MTA ID and module name.
+
+The sample `mta.yaml` contains:
+
+```yaml
+_schema-version: "3.3"
+ID: user-management
+version: 1.0.0
+
+modules:
+  - name: user-management
+    type: nodejs
+    path: .
+    parameters:
+      memory: 512M
+      disk-quota: 1G
+      instances: 1
+      buildpack: nodejs_buildpack
+      command: npm run start:prod
+
+    requires:
+      - name: postgres-db
+
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: postgres-db
+```
+
+Now create a separate file called `prod.mtaext`:
+
+```yaml
+_schema-version: "3.3"
+ID: user-management-prod
+extends: user-management
+
+modules:
+  - name: user-management
+    parameters:
+      memory: 1G
+      instances: 3
+```
+
+Let's understand the important fields:
+
+| Field             | Meaning                                               |
+| ----------------- | ----------------------------------------------------- |
+| `_schema-version` | MTA model schema version                              |
+| `ID`              | Unique ID of this extension                           |
+| `extends`         | ID of the MTA being extended                          |
+| `modules`         | Existing module whose configuration is being extended |
+| `parameters`      | Values to add or override                             |
+
+Notice that `extends` references the MTA ID, not the MTAR filename.
+
+Also notice that the extension refers to an existing module by its name. It doesn't redefine the module's type or source path.
+
+### How does the extension affect deployment?
+
+The MultiApps CLI supports the `-e` option to specify extension descriptors.
+
+For example:
+
+```
+cf deploy mta_archives/user-management_1.1.0.mtar \
+  -e prod.mtaext
+```
+
+The deployment process uses the base deployment descriptor from the archive and applies the extension configuration.
+
+The base MTA artifact remains unchanged. The extension affects the deployment configuration, not the compiled NestJS application.
+
+### What can and cannot be changed?
+
+This is an important detail.
+
+An MTA extension is not a second complete `mta.yaml`. It has specific rules.
+
+| Operation                             | Allowed?                         |
+| ------------------------------------- | -------------------------------- |
+| Override an existing module parameter | Yes, if overwritable             |
+| Add a module parameter                | Yes, subject to descriptor rules |
+| Add or override resource parameters   | Yes, subject to descriptor rules |
+| Add or override properties            | Yes, subject to descriptor rules |
+| Add a completely new module           | No                               |
+| Add a completely new resource         | No                               |
+| Change a module's type                | No                               |
+| Add a new `requires` dependency       | No                               |
+| Add a new `provides` definition       | No                               |
+
+For MTA schema 3.x, properties and parameters are generally overwritable and optional by default, unless their metadata says otherwise.
+
+**Practical implication:** if production needs a completely different service dependency that isn't represented in your base MTA, an extension alone cannot introduce that new resource. You need to model the dependency in the base MTA.
+
+### Environment-specific service names
+
+You might also want the production MTA to reference a different existing PostgreSQL service instance.
+
+The base descriptor currently has:
+
+```yaml
+resources:
+  - name: postgres-db
+    type: org.cloudfoundry.existing-service
+    parameters:
+      service-name: postgres-db
+```
+
+A production extension could override the service name:
+
+```yaml
+_schema-version: "3.3"
+ID: user-management-prod
+extends: user-management
+
+modules:
+  - name: user-management
+    parameters:
+      memory: 1G
+      instances: 3
+
+resources:
+  - name: postgres-db
+    parameters:
+      service-name: postgres-prod
+```
+
+This assumes that a service instance named `postgres-prod` already exists in the target space.
+
+The logical resource name remains `postgres-db`, so the module's `requires` dependency doesn't need to change. The extension changes the physical service instance referenced during deployment.
+
+### Where should `.mtaext` files live?
+
+A possible project structure:
+
+```
+user-management/
+│
+├── mta.yaml
+├── package.json
+├── pnpm-lock.yaml
+│
+├── config/
+│   ├── dev.mtaext
+│   ├── test.mtaext
+│   └── prod.mtaext
+│
+├── src/
+└── dist/
+```
+
+You build the MTAR:
+
+```
+mbt build -p=cf
+```
+
+Then deploy the same archive with different extensions:
+
+```
+# Development
+cf deploy mta_archives/user-management_1.1.0.mtar \
+  -e config/dev.mtaext
+
+# Test
+cf deploy mta_archives/user-management_1.1.0.mtar \
+  -e config/test.mtaext
+
+# Production
+cf deploy mta_archives/user-management_1.1.0.mtar \
+  -e config/prod.mtaext
+```
+
+The extension descriptor is separate from the MTAR archive. You supply it at deployment time.
+
+**Security note:** `.mtaext` files can contain sensitive configuration, including credentials in some scenarios. Don't commit production secrets to a public repository or distribute them as ordinary configuration files. Use the platform's supported sensitive-data handling mechanisms.
+
+Official reading: [SAP — MTA Extension Descriptor](https://developers.sap.com/concepts/mta-extension-descriptor).
+
 
 ## Deployment and troubleshooting
 

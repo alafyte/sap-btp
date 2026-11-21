@@ -41,6 +41,7 @@
    - [MTA modules and resources](./docs/mta_deployment.md#mta-modules-and-resources)
    - [MBT](./docs/mta_deployment.md#mbt)
    - [MTAR archives](./docs/mta_deployment.md#mtar-archives)
+   - [MTA Extension Descriptors](./docs/mta_deployment.md#mta-extension-descriptors)
    - [`cf deploy`](./docs/mta_deployment.md#cf-deploy)
    - [Deployment and troubleshooting](./docs/mta_deployment.md#deployment-and-troubleshooting)
    - [Blue-green deployments](./docs/mta_deployment.md#blue-green-deployments)
